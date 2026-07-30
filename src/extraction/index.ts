@@ -132,6 +132,24 @@ export function hashContent(content: string): string {
 const MAX_FILE_SIZE = 1024 * 1024;
 
 /**
+ * Per-language ceiling, for languages where the 1 MB rule of thumb is wrong.
+ *
+ * That rule assumes a multi-megabyte file is generated output with no useful
+ * symbols. An Era game's dialogue scripts break the assumption: they are
+ * hand-written, they define real functions, and several cross 1 MB purely
+ * because CJK text costs three bytes a character. Skipping them drops real
+ * source from the index without anyone having asked for that.
+ */
+const MAX_FILE_SIZE_BY_LANGUAGE: Partial<Record<Language, number>> = {
+  erabasic: 16 * 1024 * 1024,
+};
+
+/** Size ceiling for one file, by the language its path implies. */
+function maxFileSizeFor(filePath: string): number {
+  return MAX_FILE_SIZE_BY_LANGUAGE[detectLanguage(filePath)] ?? MAX_FILE_SIZE;
+}
+
+/**
  * Directory names that are dependency, build, cache, or tooling output across the
  * languages/frameworks CodeGraph supports — curated from the canonical
  * github/gitignore templates. Excluded by default so the graph reflects your code,
@@ -1894,11 +1912,12 @@ export class ExtractionOrchestrator {
         // wasting WASM heap and the worker recycle budget on inputs with no
         // useful symbols. The single-file extractFile path already enforces
         // this; the bulk path used to silently skip the check.
-        if (stats.size > MAX_FILE_SIZE) {
+        const sizeLimit = maxFileSizeFor(filePath);
+        if (stats.size > sizeLimit) {
           processed++;
           filesSkipped++;
           errors.push({
-            message: `File exceeds max size (${stats.size} > ${MAX_FILE_SIZE})`,
+            message: `File exceeds max size (${stats.size} > ${sizeLimit})`,
             filePath,
             severity: 'warning',
             code: 'size_exceeded',
@@ -2206,14 +2225,15 @@ export class ExtractionOrchestrator {
     }
 
     // Check file size
-    if (stats.size > MAX_FILE_SIZE) {
+    const sizeLimit = maxFileSizeFor(relativePath);
+    if (stats.size > sizeLimit) {
       return {
         nodes: [],
         edges: [],
         unresolvedReferences: [],
         errors: [
           {
-            message: `File exceeds max size (${stats.size} > ${MAX_FILE_SIZE})`,
+            message: `File exceeds max size (${stats.size} > ${sizeLimit})`,
             filePath: relativePath,
             severity: 'warning',
             code: 'size_exceeded',

@@ -2447,6 +2447,9 @@ export class ToolHandler {
     const RANK_EDGES = new Set<string>([
       'calls', 'references', 'extends', 'implements', 'overrides',
       'instantiates', 'returns', 'type_of', 'imports',
+      // In a language built on shared mutable state, touching the same slot is
+      // the strongest relatedness signal available.
+      'reads', 'writes',
     ]);
     const adj: number[][] = Array.from({ length: n }, () => []);
     for (const e of edges) {

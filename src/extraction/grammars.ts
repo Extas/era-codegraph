@@ -10,8 +10,9 @@ import * as path from 'path';
 import * as fsp from 'fs/promises';
 import { Parser, Language as WasmLanguage } from 'web-tree-sitter';
 import { Language } from '../types';
+import { isEraOntologyCsv } from './era/profile';
 
-export type GrammarLanguage = Exclude<Language, 'svelte' | 'vue' | 'astro' | 'liquid' | 'razor' | 'yaml' | 'twig' | 'xml' | 'properties' | 'unknown'>;
+export type GrammarLanguage = Exclude<Language, 'svelte' | 'vue' | 'astro' | 'liquid' | 'razor' | 'yaml' | 'twig' | 'xml' | 'properties' | 'erabasic' | 'eracsv' | 'unknown'>;
 
 /**
  * WASM filename map — maps each language to its .wasm grammar file
@@ -170,6 +171,11 @@ export const EXTENSION_MAP: Record<string, Language> = {
   '.tf': 'terraform',
   '.tfvars': 'terraform',
   '.tofu': 'terraform',
+  // EraBasic (.ERB/.ERH) is deliberately absent: it is matched by layout, not
+  // by extension. Rails owns `.erb` too, and a game's optional patch trees
+  // carry .ERB files the engine never loads, so only the top-level `ERB/`
+  // counts. See isEraScriptFile; the ontology CSVs work the same way
+  // (isEraOntologyCsv).
 };
 
 /**
@@ -185,6 +191,11 @@ export function isSourceFile(filePath: string, overrides?: Record<string, Langua
   if (isPlayRoutesFile(filePath)) return true; // Play `conf/routes` is extensionless
   if (isShopifyLiquidJson(filePath)) return true; // Shopify OS 2.0 JSON templates / section groups
   if (isErlangAppFile(filePath)) return true; // OTP `.app`/`.app.src` resource files
+  // Era ontology tables. `.csv` is deliberately NOT in EXTENSION_MAP: it would
+  // claim every spreadsheet in every project. Only the ~29 files the Emuera
+  // engine actually loads, sitting in the game's `CSV/` directory, qualify.
+  if (isEraOntologyCsv(filePath)) return true;
+  if (isEraScriptFile(filePath)) return true; // `.ERB` under a game's ERB/ tree
   const dot = filePath.lastIndexOf('.');
   if (dot < 0) return false;
   const ext = filePath.slice(dot).toLowerCase();
@@ -485,6 +496,13 @@ export function detectLanguage(filePath: string, source?: string, overrides?: Re
   // OTP `.app`/`.app.src` resource files — Erlang terms the grammar parses as
   // top-level expressions (last-dot ext `.src` is too generic for the map).
   if (isErlangAppFile(filePath)) return 'erlang';
+  // Era sources are matched by name and layout, not extension; see isSourceFile.
+  if (isEraOntologyCsv(filePath)) return 'eracsv';
+  if (isEraScriptFile(filePath)) {
+    // The path already says Era; a sample settles the rare case of a Rails
+    // template that happens to live in a directory called `erb`.
+    return !source || looksLikeEraBasic(source) ? 'erabasic' : 'unknown';
+  }
   const lang = (overrides && overrides[ext]) || EXTENSION_MAP[ext] || 'unknown';
 
   // .h files could be C, C++, or Objective-C — check source content
@@ -494,6 +512,52 @@ export function detectLanguage(filePath: string, source?: string, overrides?: Re
   }
 
   return lang;
+}
+
+/**
+ * An EraBasic script or header: `.ERB`/`.ERH` under the game's top-level `ERB/`.
+ *
+ * Anchored at the project root because that is exactly what the engine loads:
+ * Emuera reads `<gamedir>/ERB` and nothing else. Games ship optional patches
+ * and dialogue templates in sibling directories that contain their own `ERB/`
+ * trees, and those files are not part of the game. Indexing them invents a
+ * second definition of functions the game defines once, and offers those
+ * phantoms as dispatch candidates that can never actually be reached.
+ *
+ * The anchoring also settles the `.erb` collision with Rails: a Rails app has
+ * no top-level `ERB/` beside a `CSV/`, and the content check in detectLanguage
+ * catches the remaining coincidence.
+ */
+export function isEraScriptFile(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
+  if (!normalized.endsWith('.erb') && !normalized.endsWith('.erh')) return false;
+  return normalized.startsWith('erb/');
+}
+
+/**
+ * Heuristic: is this `.erb` an EraBasic script rather than a Rails template?
+ *
+ * The path already carried most of the evidence (isEraScriptFile required a
+ * game `ERB/` tree), so this only has to catch the collision. A Rails template
+ * is markup carrying `<% %>` tags and nothing else uses that sequence, which
+ * makes its ABSENCE the reliable test.
+ *
+ * Requiring a positive Era marker instead would be wrong: a game ships
+ * comment-only stubs and placeholder scripts with no declaration at all, and
+ * they are still EraBasic. Dropping them would silently shrink the indexed
+ * source set, which is exactly the kind of quiet gap this graph exists to make
+ * impossible.
+ */
+function looksLikeEraBasic(source: string): boolean {
+  const head = source.slice(0, 32768);
+  // A structural marker settles it outright. It has to: Era scripts print
+  // literal `<%…%>` markup as button text, so the tag alone cannot decide.
+  if (/^[ \t]*(?:@[^\s(;]|\$[^\s;]|#(?:DIM|DIMS|FUNCTION|FUNCTIONS|LOCALSIZE|LOCALSSIZE|INCLUDE|PRI|LATER|SINGLE|ONLY)\b)/m.test(head)) {
+    return true;
+  }
+  // No marker and no template tag: a comment-only or placeholder script, which
+  // is still EraBasic. Only a tag with no marker anywhere points at Rails.
+  return !/<%/.test(head);
 }
 
 /**
@@ -536,6 +600,8 @@ export function isLanguageSupported(language: Language): boolean {
   if (language === 'twig') return true; // file-level tracking only
   if (language === 'xml') return true; // MyBatis mapper extractor
   if (language === 'properties') return true; // Spring config keys
+  if (language === 'erabasic') return true; // custom line-oriented EraBasic extractor
+  if (language === 'eracsv') return true; // Era ontology CSV / engine vocabulary extractors
   if (language === 'unknown') return false;
   return language in WASM_GRAMMAR_FILES;
 }
@@ -547,6 +613,7 @@ export function isGrammarLoaded(language: Language): boolean {
   if (language === 'svelte' || language === 'vue' || language === 'astro' || language === 'liquid' || language === 'razor') return true;
   if (language === 'yaml' || language === 'twig') return true; // no WASM grammar needed
   if (language === 'xml' || language === 'properties') return true; // no WASM grammar needed
+  if (language === 'erabasic' || language === 'eracsv') return true; // no WASM grammar needed
   return languageCache.has(language);
 }
 
@@ -655,6 +722,8 @@ export function getLanguageDisplayName(language: Language): string {
     erlang: 'Erlang',
     terraform: 'Terraform',
     arkts: 'ArkTS',
+    erabasic: 'EraBasic',
+    eracsv: 'Era ontology CSV',
     unknown: 'Unknown',
   };
   return names[language] || language;

@@ -21,6 +21,7 @@ import { resolveViaImport, resolveJvmImport, extractImportMappings, extractReExp
 import { ResolverPool, minRefsForPool } from './resolver-pool';
 import { detectFrameworks } from './frameworks';
 import { synthesizeCallbackEdges } from './callback-synthesizer';
+import { synthesizeEraDispatchEdges } from './era-dispatch';
 import { createYielder, type MaybeYield } from './cooperative-yield';
 import { loadProjectAliases, type AliasMap } from './path-aliases';
 import { loadGoModule, type GoModule } from './go-module';
@@ -336,6 +337,28 @@ export class ReferenceResolver {
         });
       }
     }
+    // Interpolated Era call sites fan out to many targets, so they cannot go
+    // through the per-reference resolver (a ResolvedRef names one target).
+    // Running here covers both a full index and every incremental sync, and
+    // the pass costs one indexed range scan when the project is not an Era
+    // game. Additive and best-effort: a failure must not fail the index.
+    if (this.frameworks.some((fw) => fw.name === 'era')) {
+      try {
+        const dispatch = synthesizeEraDispatchEdges(this.queries, this.context);
+        if (dispatch.edges > 0) {
+          logDebug(
+            `era-dispatch: ${dispatch.edges} edges from ${dispatch.sites} sites` +
+              (dispatch.skipped ? `, ${dispatch.skipped} sites too wide to expand` : '')
+          );
+          updated += dispatch.sites;
+        }
+      } catch (err) {
+        logDebug('era-dispatch synthesis failed', {
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+
     if (updated > 0) this.clearCaches();
     return updated;
   }

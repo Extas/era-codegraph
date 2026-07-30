@@ -66,6 +66,14 @@ export const EDGE_KINDS = [
   'instantiates',    // Creates instance of class
   'overrides',       // Method overrides parent method
   'decorates',       // Decorator applied to symbol
+  // Data-flow direction. `references` cannot express it, and for a language
+  // built entirely on shared mutable state ("who writes ABL:顺从, and who
+  // reads it afterwards") the direction IS the question. It has to be the
+  // edge kind rather than metadata: only `kind` is indexed
+  // (idx_edges_kind / _source_kind / _target_kind), so a metadata flag would
+  // turn every such query into a full scan.
+  'reads',           // Function reads a variable or named slot
+  'writes',          // Function writes a variable or named slot
 ] as const;
 
 export type EdgeKind = (typeof EDGE_KINDS)[number];
@@ -116,6 +124,10 @@ export const LANGUAGES = [
   'vbnet',
   'erlang',
   'terraform',
+  // EraBasic scripts (.ERB/.ERH) and the ontology CSVs an Era game loads.
+  // Both use grammarless custom extractors; see src/extraction/era.
+  'erabasic',
+  'eracsv',
   'unknown',
 ] as const;
 

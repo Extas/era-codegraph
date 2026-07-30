@@ -29,6 +29,9 @@ import { AstroExtractor } from './astro-extractor';
 import { DfmExtractor } from './dfm-extractor';
 import { VueExtractor } from './vue-extractor';
 import { MyBatisExtractor } from './mybatis-extractor';
+import { EraBasicExtractor } from './era/erb-extractor';
+import { EraCsvExtractor } from './era/csv-extractor';
+import { EraEngineExtractor, isEraEngineAnchor } from './era/engine-extractor';
 import { CfmlExtractor } from './cfml-extractor';
 import { tryKernelExtract, takeDeferredPreParse } from './kernel';
 import {
@@ -6697,6 +6700,19 @@ export function extractFromSource(
     // `component { ... }` declares no name (the grammar has no `name` field;
     // CFML never spells one in source) stays `<anonymous>`.
     const extractor = new CfmlExtractor(filePath, source, detectedLanguage);
+    result = extractor.extract();
+  } else if (detectedLanguage === 'erabasic') {
+    // EraBasic (.ERB/.ERH). No tree-sitter grammar exists for the language;
+    // the extractor is line-oriented and emits reads/writes per function.
+    const extractor = new EraBasicExtractor(filePath, source);
+    result = extractor.extract();
+  } else if (detectedLanguage === 'eracsv') {
+    // GameBase.csv anchors the engine vocabulary (the ~170 built-in variables
+    // a script uses but no file in the game declares); every other ontology
+    // CSV contributes its named slots.
+    const extractor = isEraEngineAnchor(filePath)
+      ? new EraEngineExtractor(filePath, source)
+      : new EraCsvExtractor(filePath, source);
     result = extractor.extract();
   } else if (isFileLevelOnlyLanguage(detectedLanguage)) {
     // No symbol extraction at this stage — files are tracked at the file-record

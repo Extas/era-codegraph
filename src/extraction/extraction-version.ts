@@ -21,4 +21,6 @@
  * turns the re-index hint into noise — keep it honest (see CLAUDE.md, "Honesty
  * in the product is load-bearing").
  */
-export const EXTRACTION_VERSION = 24;
+// 25: Era adapter — EraBasic and ontology-CSV extractors, the `reads`/`writes`
+// edge kinds, and the interpolated-call dispatch synthesizer.
+export const EXTRACTION_VERSION = 25;

@@ -2057,6 +2057,36 @@ export class QueryBuilder {
   }
 
   /**
+   * Unresolved references whose name starts with `prefix`, whatever their
+   * status.
+   *
+   * Dispatch synthesizers need this because their references are one-to-many
+   * and cannot go through the per-ref resolver at all: a ResolvedRef names a
+   * single target, while `TRYCALLFORM COM_ABLE{n}` reaches every `COM_ABLE<n>`
+   * the game defines. Expressed as a range scan rather than LIKE so it uses
+   * idx_unresolved_name instead of walking the table.
+   */
+  getUnresolvedReferencesByNamePrefix(prefix: string): UnresolvedReference[] {
+    if (!prefix) return [];
+    // Smallest string greater than everything starting with `prefix`.
+    const upper = prefix.slice(0, -1) + String.fromCharCode(prefix.charCodeAt(prefix.length - 1) + 1);
+    const rows = this.db
+      .prepare('SELECT * FROM unresolved_refs WHERE reference_name >= ? AND reference_name < ?')
+      .all(prefix, upper) as UnresolvedRefRow[];
+    return rows.map((row) => ({
+      fromNodeId: row.from_node_id,
+      referenceName: row.reference_name,
+      referenceKind: row.reference_kind as EdgeKind,
+      line: row.line,
+      column: row.col,
+      candidates: row.candidates ? safeJsonParse(row.candidates, undefined) : undefined,
+      filePath: row.file_path,
+      language: row.language as Language,
+      rowId: row.id,
+    }));
+  }
+
+  /**
    * Get the count of PENDING (never-attempted) references without loading
    * them into memory. Rows marked status='failed' — attempted by a completed
    * pass, no match — are excluded: they are not outstanding work, only retry

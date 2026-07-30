@@ -4,6 +4,7 @@
  * Manages the .codegraph/ directory structure for CodeGraph data.
  */
 
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -80,9 +81,40 @@ export function isCodeGraphDataDir(name: string): boolean {
 }
 
 /**
- * Get the .codegraph directory path for a project
+ * Out-of-tree index location, from `CODEGRAPH_INDEX_ROOT`.
+ *
+ * Some trees must not be written to at all. A pinned source snapshot is the
+ * clearest case: its whole value is that it is byte-for-byte what a hash says
+ * it is, and dropping an index directory into it makes the tree no longer that
+ * snapshot. Pointing this at a scratch directory keeps the index entirely
+ * outside, one subdirectory per project root.
+ *
+ * The subdirectory is named from a hash of the absolute project root so two
+ * projects never collide and the mapping is stable across runs. Ignored unless
+ * absolute, for the same reason CODEGRAPH_DIR rejects paths.
+ */
+function externalIndexRoot(): string | null {
+  const raw = process.env.CODEGRAPH_INDEX_ROOT?.trim();
+  if (!raw || !path.isAbsolute(raw)) return null;
+  return raw;
+}
+
+/**
+ * Get the data directory for a project: `<root>/.codegraph` normally, or a
+ * per-project subdirectory of `CODEGRAPH_INDEX_ROOT` when the project tree
+ * must stay untouched.
  */
 export function getCodeGraphDir(projectRoot: string): string {
+  const external = externalIndexRoot();
+  if (external) {
+    const key = crypto
+      .createHash('sha256')
+      .update(path.resolve(projectRoot))
+      .digest('hex')
+      .slice(0, 16);
+    const label = path.basename(path.resolve(projectRoot)).replace(/[^A-Za-z0-9._-]/g, '_') || 'project';
+    return path.join(external, `${label}-${key}`);
+  }
   return path.join(projectRoot, codeGraphDirName());
 }
 
