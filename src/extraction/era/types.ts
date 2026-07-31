@@ -87,6 +87,18 @@ export interface EraEngineProfile {
    * exist for every built-in it sees.
    */
   methods: string[];
+  /**
+   * Character-sheet (`Chara*.csv`) key table, from the engine's
+   * `toCharacterTemplate`. The row key decides which variable the row
+   * initializes, and the mapping holds real surprises: `基礎` writes MAXBASE,
+   * and `珠` is named through palam.csv. `identity` keys carry who the sheet
+   * is (番号, 名前, …); `ignored` keys the engine itself discards.
+   */
+  chara?: {
+    keys: Record<string, string>;
+    identity: string[];
+    ignored: string[];
+  };
 }
 
 /** Indexed views of a profile, built once and shared by every extractor. */
@@ -98,6 +110,12 @@ export interface EraProfileIndex {
   instructions: Map<string, EraInstruction>;
   /** Built-in expression function names. */
   methods: Set<string>;
+  /** Chara-sheet row key -> variable it initializes (`素質` -> `TALENT`). */
+  charaKeys: Map<string, string>;
+  /** Chara-sheet identity keys (`番号`, `名前`, …). */
+  charaIdentityKeys: Set<string>;
+  /** Chara-sheet keys the engine itself discards (`助手`, `ISASSI`). */
+  charaIgnoredKeys: Set<string>;
   /** Lowercased CSV basename -> the variables it names. */
   csvToVariables: Map<string, EraVariable[]>;
   /** Lowercased CSV basename set, for `is this file ontology` checks. */

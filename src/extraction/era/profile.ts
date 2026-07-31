@@ -65,6 +65,9 @@ export function indexProfile(profile: EraEngineProfile): EraProfileIndex {
 
   const instructions = new Map(profile.instructions.map((i) => [i.name, i]));
   const methods = new Set(profile.methods ?? []);
+  const charaKeys = new Map(Object.entries(profile.chara?.keys ?? {}));
+  const charaIdentityKeys = new Set(profile.chara?.identity ?? []);
+  const charaIgnoredKeys = new Set(profile.chara?.ignored ?? []);
 
   const csvToVariables = new Map<string, EraVariable[]>();
   for (const v of profile.variables) {
@@ -82,7 +85,17 @@ export function indexProfile(profile: EraEngineProfile): EraProfileIndex {
   for (const f of profile.csvFiles) ontologyCsvNames.add(f.toLowerCase());
   for (const key of csvToVariables.keys()) ontologyCsvNames.add(key);
 
-  return { profile, variables, instructions, methods, csvToVariables, ontologyCsvNames };
+  return {
+    profile,
+    variables,
+    instructions,
+    methods,
+    charaKeys,
+    charaIdentityKeys,
+    charaIgnoredKeys,
+    csvToVariables,
+    ontologyCsvNames,
+  };
 }
 
 /**
@@ -114,4 +127,20 @@ export function isEraOntologyCsv(filePath: string, index?: EraProfileIndex): boo
     return false;
   }
   return profileIndex.ontologyCsvNames.has(lower);
+}
+
+/**
+ * A character sheet: `Chara*.csv` anywhere under the game's `CSV/`.
+ *
+ * The engine enumerates `CHARA*.CSV` case-insensitively and, with
+ * `サブディレクトリを検索する` on (era-ym has it on), descends into
+ * subdirectories, so `CSV/chara/1000_win東方/Chara1000 あなた.csv` is as much
+ * a loaded file as `CSV/Chara500.csv`. These are instance data, not ontology:
+ * they get their own extractor that turns rows into writes.
+ */
+export function isEraCharaCsv(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
+  if (!normalized.startsWith('csv/')) return false;
+  const base = normalized.slice(normalized.lastIndexOf('/') + 1);
+  return base.startsWith('chara') && base.endsWith('.csv');
 }

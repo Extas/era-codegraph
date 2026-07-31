@@ -65,10 +65,12 @@ const funcCodePath = findFile(srcDir, 'FunctionCode.cs');
 
 const methodCreatorPath = findFile(srcDir, 'FunctionMethodCreator.cs');
 
+const constDataSource = read(constDataPath);
 const variables = parseVariableCode(read(varCodePath));
-const { csvFiles, bindings } = parseConstantData(read(constDataPath));
+const { csvFiles, bindings } = parseConstantData(constDataSource);
 const instructions = parseInstructions(read(funcIdentPath), read(funcCodePath));
 const methods = parseMethods(read(methodCreatorPath));
+const chara = parseCharaKeys(constDataSource);
 
 // Attach each variable's csv binding. A variable with no binding indexes by
 // number only, which is exactly the `unnamed slot` case downstream.
@@ -98,6 +100,7 @@ const profile = {
   variables: variables.sort((a, b) => a.name.localeCompare(b.name)),
   instructions: instructions.sort((a, b) => a.name.localeCompare(b.name)),
   methods: methods.sort(),
+  chara,
 };
 
 fs.mkdirSync(path.dirname(args.out), { recursive: true });
@@ -321,6 +324,56 @@ function parseInstructions(identSrc, codeSrc) {
   if (event) event.kind = 'event';
 
   return [...byName.values()];
+}
+
+/**
+ * Character-sheet key table, from `toCharacterTemplate` in ConstantData.
+ *
+ * A `Chara*.csv` row is `<key>,<index>,<value>`; the KEY decides which built-in
+ * variable the row initializes, and that mapping is engine truth with real
+ * surprises in it: `基礎` writes MAXBASE (not BASE), and `珠` is named through
+ * palam.csv. Deriving the table keeps those facts from being re-guessed in the
+ * extractor.
+ */
+function parseCharaKeys(src) {
+  // Scoped to the one function so the regexes cannot pick up other switches.
+  const body = sliceBetween(src, 'private void toCharacterTemplate', '\n\tprivate ');
+  const MEMBER_TO_VARIABLE = {
+    Mark: 'MARK',
+    Exp: 'EXP',
+    Abl: 'ABL',
+    Maxbase: 'MAXBASE',
+    Talent: 'TALENT',
+    Relation: 'RELATION',
+    CFlag: 'CFLAG',
+    Equip: 'EQUIP',
+    Juel: 'JUEL',
+    CStr: 'CSTR',
+  };
+
+  const keys = {};
+  const value = /((?:case "[^"]+":\s*)+)num2 = Character(?:Int|Str)ArrayLength\[\d+\];\s*dictionary2? = chara\.(\w+);/g;
+  for (const m of body.matchAll(value)) {
+    const variable = MEMBER_TO_VARIABLE[m[2]];
+    if (!variable) throw new Error(`unknown chara member: ${m[2]}`);
+    for (const c of m[1].matchAll(/case "([^"]+)":/g)) keys[c[1]] = variable;
+  }
+
+  const identity = [];
+  const ident = /((?:case "[^"]+":\s*)+)chara\.(Name|Callname|Nickname|Mastername) = tokens\[1\];/g;
+  for (const m of body.matchAll(ident)) {
+    for (const c of m[1].matchAll(/case "([^"]+)":/g)) identity.push(c[1]);
+  }
+  // The number row is handled in the load loop, not the switch.
+  if (!src.includes('"番号"')) throw new Error('chara number-row handling not found');
+  identity.push('番号', 'NO');
+
+  const ignored = [];
+  const drop = /case "([^"]+)":\s*return;/g;
+  for (const m of body.matchAll(drop)) ignored.push(m[1]);
+
+  if (Object.keys(keys).length < 10) throw new Error('chara key table too small; decompile layout changed');
+  return { keys, identity: identity.sort(), ignored: ignored.sort() };
 }
 
 /**

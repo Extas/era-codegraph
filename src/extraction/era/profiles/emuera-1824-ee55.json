@@ -4420,5 +4420,44 @@
     "XML_SET",
     "XML_SET_BYNAME",
     "XML_TOSTR"
-  ]
+  ],
+  "chara": {
+    "keys": {
+      "MARK": "MARK",
+      "刻印": "MARK",
+      "経験": "EXP",
+      "EXP": "EXP",
+      "能力": "ABL",
+      "ABL": "ABL",
+      "BASE": "MAXBASE",
+      "基礎": "MAXBASE",
+      "素質": "TALENT",
+      "TALENT": "TALENT",
+      "相性": "RELATION",
+      "RELATION": "RELATION",
+      "フラグ": "CFLAG",
+      "CFLAG": "CFLAG",
+      "装着物": "EQUIP",
+      "EQUIP": "EQUIP",
+      "JUEL": "JUEL",
+      "珠": "JUEL",
+      "CSTR": "CSTR"
+    },
+    "identity": [
+      "CALLNAME",
+      "MASTERNAME",
+      "NAME",
+      "NICKNAME",
+      "NO",
+      "あだ名",
+      "主人の呼び方",
+      "名前",
+      "呼び名",
+      "番号"
+    ],
+    "ignored": [
+      "ISASSI",
+      "助手"
+    ]
+  }
 }

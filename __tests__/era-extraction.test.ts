@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { EraBasicExtractor } from '../src/extraction/era/erb-extractor';
 import { EraCsvExtractor } from '../src/extraction/era/csv-extractor';
+import { EraCharaExtractor } from '../src/extraction/era/chara-extractor';
 import { EraEngineExtractor, isEraEngineAnchor } from '../src/extraction/era/engine-extractor';
-import { getEraProfile, isEraOntologyCsv } from '../src/extraction/era/profile';
+import { getEraProfile, isEraCharaCsv, isEraOntologyCsv } from '../src/extraction/era/profile';
 import { detectLanguage, isSourceFile } from '../src/extraction/grammars';
 import { EDGE_KINDS, LANGUAGES } from '../src/types';
 
@@ -220,6 +221,28 @@ describe('EraBasic extraction', () => {
     expect(refNames(result, 'calls')).toContain('ERA::DYN::EVENT_K|_A');
   });
 
+  it('strips a FORM call argument list out of the dynamic suffix', () => {
+    // Verbatim shapes from the game. The argument list after the built target
+    // must not ride into the suffix, or the whole RANDOM_CHARA_*_SET_ family
+    // matches nothing; and a paren inside a hole is part of the target.
+    const result = extractErb(
+      [
+        '@F',
+        'TRYCALLFORM RANDOM_CHARA_TALENT_SET_%kind%(chara)',
+        'CALLFORM daily_event_%name%(ARG)',
+        'TRYCALLFORM COM_%id%_SUB(a, b)',
+      ].join('\n'),
+      'ERB/F.ERB'
+    );
+    const calls = refNames(result, 'calls');
+    expect(calls).toContain('ERA::DYN::RANDOM_CHARA_TALENT_SET_|');
+    expect(calls).toContain('ERA::DYN::daily_event_|');
+    expect(calls).toContain('ERA::DYN::COM_|_SUB');
+    expect(calls.some((c) => c.includes('('))).toBe(false);
+    // The stripped argument lists are still scanned as expressions.
+    expect(refNames(result, 'reads')).toContain('ERA::REF::chara');
+  });
+
   it('declares an ERH global as a global, and marks SAVEDATA ones', () => {
     const result = extractErb(
       '#DIM 残存PALAM, 33\n#DIM CHARADATA SAVEDATA custom_talent, 30\n#DIM CONST MAX_KOJO = 3',
@@ -343,6 +366,62 @@ describe('ontology CSV extraction', () => {
   it('reports a duplicate index instead of showing two truths silently', () => {
     const result = new EraCsvExtractor('CSV/Abl.csv', '10,顺从\n10,再定义').extract();
     expect(result.errors.map((e) => e.code)).toContain('era_duplicate_slot');
+  });
+});
+
+describe('character sheets', () => {
+  const SHEET = [
+    '﻿番号,1002',
+    '名前,テスト',
+    '呼び名,テスト,',
+    '基礎,0,2500,',
+    '素質,120,1,;男性',
+    '素質,52,;舌头灵活',
+    '能力,顺从,5',
+    'フラグ,3200,100,;种族',
+    'CSTR,31,テスト,',
+    '相性,1001,50',
+    '助手,1',
+    '謎のキー,1',
+  ].join('\r\n');
+
+  it('turns rows into writes under the engine key table', () => {
+    const result = new EraCharaExtractor('CSV/chara/Chara1002 テスト.csv', SHEET).extract();
+    const sheet = result.nodes.find((n) => n.kind === 'module')!;
+    expect(sheet.qualifiedName).toBe('ERA::CHARA::1002');
+    expect(sheet.name).toBe('テスト');
+
+    const writes = result.unresolvedReferences
+      .filter((r) => r.referenceKind === 'writes')
+      .map((r) => r.referenceName);
+    // 基礎 initializes MAXBASE, not BASE — the engine's own surprise.
+    expect(writes).toContain('ERA::REF::MAXBASE:0');
+    expect(writes).toContain('ERA::REF::TALENT:120');
+    // A comment-only third field means value 1; the row still writes.
+    expect(writes).toContain('ERA::REF::TALENT:52');
+    // The index may be a CSV name, settled later by the resolver.
+    expect(writes).toContain('ERA::REF::ABL:顺从');
+    expect(writes).toContain('ERA::REF::CFLAG:3200');
+    expect(writes).toContain('ERA::REF::CSTR:31');
+    expect(writes).toContain('ERA::REF::RELATION:1001');
+    // Identity and engine-discarded keys write nothing.
+    expect(writes.some((w) => w.includes('番号') || w.includes('助手'))).toBe(false);
+    // A key the engine cannot interpret is warned about, once.
+    expect(result.errors.filter((e) => e.code === 'era_unknown_chara_key')).toHaveLength(1);
+  });
+
+  it('recovers the number from the filename when the 番号 row is missing', () => {
+    const result = new EraCharaExtractor('CSV/Chara500 あなた.csv', '名前,あなた\r\n素質,120,1').extract();
+    expect(result.nodes.find((n) => n.kind === 'module')!.qualifiedName).toBe('ERA::CHARA::500');
+  });
+
+  it('claims Chara*.csv at any depth under CSV/, and nothing else', () => {
+    expect(isEraCharaCsv('CSV/chara/1000_win東方/Chara1000 あなた.csv')).toBe(true);
+    expect(isEraCharaCsv('CSV/Chara500 あなた.csv')).toBe(true);
+    expect(isEraCharaCsv('CSV/Talent.csv')).toBe(false);
+    expect(isEraCharaCsv('data/Chara1.csv')).toBe(false);
+    expect(detectLanguage('CSV/chara/Chara1000.csv')).toBe('eracsv');
+    expect(isSourceFile('CSV/chara/Chara1000.csv')).toBe(true);
   });
 });
 

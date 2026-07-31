@@ -99,7 +99,15 @@ and the game directory is never written to.
   (plus `GameBase.csv`), and only as `CSV/<name>` at the project root. A game may
   ship `Juel.csv` beside the rest, but the engine names JUEL through
   `Palam.csv`, so it is correctly left out.
-- `CSV/chara/` is per-character instance data, not ontology, and is not indexed.
+- `Chara*.csv` character sheets (any depth under `CSV/`, matching the engine's
+  recursive `CHARA*.CSV` enumeration) are indexed as instance data: one
+  `module` node per sheet (`ERA::CHARA::<no>`) whose rows become `writes`
+  edges to the slots they initialize. Which row key initializes which
+  variable is engine truth carried by the profile, with real surprises in it:
+  `基礎` writes MAXBASE (named through base.csv, so the edges land on BASE
+  slots) and `珠` is named through palam.csv. Without the sheets, "who writes
+  this talent" only ever finds runtime randomizers and every initial value
+  looks source-less. Values are not stored; they live on the cited CSV line.
 - The 1 MB file-size cutoff is raised to 16 MB for EraBasic: dialogue scripts are
   hand-written source that crosses 1 MB only because CJK costs three bytes a
   character.
@@ -129,7 +137,13 @@ belongs in that variable's consumers.
 
 Interpolated call sites produce `calls` edges marked `provenance: heuristic`
 with `metadata.synthesizedBy = "era-dispatch"` and a candidate count. They are
-reach, not a direct call, and the output says so.
+reach, not a direct call, and the output says so. An argument list after the
+built target (`CALLFORM daily_event_%name%(ARG)`) is stripped hole-aware
+before the prefix/suffix are recorded — leaving it in the suffix is how whole
+dispatch families end up matching nothing. A pattern that still expands to
+zero candidates means the targets genuinely do not exist in the game (optional
+kojo patches, unused template hooks) or the non-numeric candidate set exceeds
+the loose-tier cap; both are reported, not silently dropped.
 
 Function nodes carry traits in `decorators`: `branches:N`, `random`, and
 `dynamic-dispatch:N`.

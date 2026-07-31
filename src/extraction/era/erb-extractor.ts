@@ -553,18 +553,19 @@ export class EraBasicExtractor {
     let targetText = (comma < 0 ? rest : rest.slice(0, comma)).trim();
     const argText = comma < 0 ? '' : rest.slice(comma + 1);
 
-    // `CALL FUNC(a, b)` puts the arguments in parens instead of after a comma.
-    // A FORM target never uses that syntax, and its interpolations routinely
-    // contain parens (`KOJO_%kojo_index(TARGET)%_MESSAGE_…`); splitting there
-    // would truncate the target and feed the remainder to the expression
-    // scanner as if it were code.
+    // `CALL FUNC(a, b)` passes arguments in parens, and a FORM call does the
+    // same after its built target: `CALLFORM daily_event_%name%(ARG)`. The
+    // split must be hole-aware, because interpolations routinely contain
+    // parens of their own (`KOJO_%kojo_index(TARGET)%_MESSAGE_…`) and cutting
+    // inside a hole would truncate the target. Skipping the split for FORM
+    // calls is not an option either: the argument list then rides into the
+    // dynamic suffix and the site matches nothing, which is exactly how the
+    // RANDOM_CHARA_*_SET_ and daily_event_ families went unexpanded.
     let parenArgs = '';
-    if (!isForm) {
-      const paren = targetText.indexOf('(');
-      if (paren >= 0) {
-        parenArgs = targetText.slice(paren + 1).replace(/\)\s*$/, '');
-        targetText = targetText.slice(0, paren).trim();
-      }
+    const paren = this.topLevelParenOutsideHoles(targetText);
+    if (paren >= 0) {
+      parenArgs = targetText.slice(paren + 1).replace(/\)\s*$/, '');
+      targetText = targetText.slice(0, paren).trim();
     }
 
     if (isForm) {
@@ -731,6 +732,20 @@ export class EraBasicExtractor {
     const incdec = code.match(new RegExp(`^\\s*(${IDENT}(?::[^\\s]+)*)\\s*(\\+\\+|--)\\s*$`));
     if (incdec) return { lhs: incdec[1]!, rhs: '', compound: true };
     return null;
+  }
+
+  /** Index of the first `(` outside `{…}`/`%…%` holes, or -1. */
+  private topLevelParenOutsideHoles(text: string): number {
+    let inBrace = false;
+    let inPercent = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i]!;
+      if (ch === '{') inBrace = true;
+      else if (ch === '}') inBrace = false;
+      else if (ch === '%') inPercent = !inPercent;
+      else if (ch === '(' && !inBrace && !inPercent) return i;
+    }
+    return -1;
   }
 
   /** Index of `needle` outside parens and strings, or -1. */

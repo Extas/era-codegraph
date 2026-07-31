@@ -31,7 +31,9 @@ import { VueExtractor } from './vue-extractor';
 import { MyBatisExtractor } from './mybatis-extractor';
 import { EraBasicExtractor } from './era/erb-extractor';
 import { EraCsvExtractor } from './era/csv-extractor';
+import { EraCharaExtractor } from './era/chara-extractor';
 import { EraEngineExtractor, isEraEngineAnchor } from './era/engine-extractor';
+import { isEraCharaCsv } from './era/profile';
 import { CfmlExtractor } from './cfml-extractor';
 import { tryKernelExtract, takeDeferredPreParse } from './kernel';
 import {
@@ -6708,11 +6710,14 @@ export function extractFromSource(
     result = extractor.extract();
   } else if (detectedLanguage === 'eracsv') {
     // GameBase.csv anchors the engine vocabulary (the ~170 built-in variables
-    // a script uses but no file in the game declares); every other ontology
-    // CSV contributes its named slots.
+    // a script uses but no file in the game declares); Chara*.csv sheets turn
+    // into writers of the slots they initialize; every other ontology CSV
+    // contributes its named slots.
     const extractor = isEraEngineAnchor(filePath)
       ? new EraEngineExtractor(filePath, source)
-      : new EraCsvExtractor(filePath, source);
+      : isEraCharaCsv(filePath)
+        ? new EraCharaExtractor(filePath, source)
+        : new EraCsvExtractor(filePath, source);
     result = extractor.extract();
   } else if (isFileLevelOnlyLanguage(detectedLanguage)) {
     // No symbol extraction at this stage — files are tracked at the file-record

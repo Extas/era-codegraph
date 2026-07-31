@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as fsp from 'fs/promises';
 import { Parser, Language as WasmLanguage } from 'web-tree-sitter';
 import { Language } from '../types';
-import { isEraOntologyCsv } from './era/profile';
+import { isEraCharaCsv, isEraOntologyCsv } from './era/profile';
 
 export type GrammarLanguage = Exclude<Language, 'svelte' | 'vue' | 'astro' | 'liquid' | 'razor' | 'yaml' | 'twig' | 'xml' | 'properties' | 'erabasic' | 'eracsv' | 'unknown'>;
 
@@ -195,6 +195,7 @@ export function isSourceFile(filePath: string, overrides?: Record<string, Langua
   // claim every spreadsheet in every project. Only the ~29 files the Emuera
   // engine actually loads, sitting in the game's `CSV/` directory, qualify.
   if (isEraOntologyCsv(filePath)) return true;
+  if (isEraCharaCsv(filePath)) return true; // `Chara*.csv` sheets anywhere under CSV/
   if (isEraScriptFile(filePath)) return true; // `.ERB` under a game's ERB/ tree
   const dot = filePath.lastIndexOf('.');
   if (dot < 0) return false;
@@ -498,6 +499,7 @@ export function detectLanguage(filePath: string, source?: string, overrides?: Re
   if (isErlangAppFile(filePath)) return 'erlang';
   // Era sources are matched by name and layout, not extension; see isSourceFile.
   if (isEraOntologyCsv(filePath)) return 'eracsv';
+  if (isEraCharaCsv(filePath)) return 'eracsv';
   if (isEraScriptFile(filePath)) {
     // The path already says Era; a sample settles the rare case of a Rails
     // template that happens to live in a directory called `erb`.

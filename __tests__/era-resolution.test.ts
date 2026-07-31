@@ -28,7 +28,14 @@ function writeGame(dir: string): void {
   fs.mkdirSync(erb, { recursive: true });
 
   fs.writeFileSync(path.join(csv, 'GameBase.csv'), 'コード,1000\r\nタイトル,mini-era\r\n');
+  fs.writeFileSync(path.join(csv, 'Base.csv'), '0,体力\r\n1,气力\r\n');
+  fs.writeFileSync(path.join(csv, 'Talent.csv'), '10,胆怯\r\n120,男性\r\n');
   fs.writeFileSync(path.join(csv, 'Abl.csv'), ';能力\r\n0,Ｃ感觉\r\n10,顺从\r\n11,侍奉精神\r\n');
+  fs.mkdirSync(path.join(csv, 'chara'), { recursive: true });
+  fs.writeFileSync(
+    path.join(csv, 'chara', 'Chara1002 テスト.csv'),
+    ['番号,1002', '名前,テスト', '素質,10,1', '能力,顺从,5', '基礎,0,2000'].join('\r\n')
+  );
   fs.writeFileSync(path.join(csv, 'Item.csv'), '40,大镜子,70,;羞耻play用\r\n49,浴室用大镜子,80000,\r\n');
   fs.writeFileSync(path.join(csv, 'Tequip.csv'), '43,羞耻play\r\n44,浴室play\r\n');
   fs.writeFileSync(path.join(csv, 'Flag.csv'), '15,指令扩展位\r\n');
@@ -207,6 +214,25 @@ describe('era cross-layer resolution', () => {
     expect(targets).toEqual(['COM_ABLE103', 'COM_ABLE104', 'COM_ABLE105']);
     // Re-deriving must not double the edges that were already there.
     expect(countDispatch()).toBe(before + 1);
+  });
+
+  it('binds character-sheet rows to the same slots the scripts touch', () => {
+    // Without the sheets, "who writes TALENT:10" only finds runtime code and
+    // every initial value looks source-less. The sheet writes by number AND by
+    // CSV name, and both must land on the script-visible slot nodes; 基礎 rows
+    // land on BASE slots because the engine's MAXBASE is named through base.csv.
+    const rows = (cg as unknown as { db: { db: any } }).db.db
+      .prepare(
+        `SELECT t.qualified_name qn FROM edges e
+         JOIN nodes s ON s.id = e.source JOIN nodes t ON t.id = e.target
+         WHERE s.qualified_name = 'ERA::CHARA::1002' AND e.kind = 'writes'
+         ORDER BY t.qualified_name`
+      )
+      .all()
+      .map((r: { qn: string }) => r.qn);
+    expect(rows).toContain('ERA::SLOT::TALENT:10');
+    expect(rows).toContain('ERA::SLOT::ABL:10');
+    expect(rows).toContain('ERA::SLOT::BASE:0');
   });
 
   it('anchors every claim on a path and line', () => {
