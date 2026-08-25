@@ -12,6 +12,7 @@ codegraph version on a chosen real-world repo. Drives the harness in
 ## Prerequisites
 - `tmux` 3+, a logged-in `claude` CLI, `node`, `git` (macOS/Linux).
 - Run from the codegraph repo root.
+- The harness scripts own the current model and effort policy (`sonnet`, high). Do not override them from the Skill.
 
 ## Workflow
 
