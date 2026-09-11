@@ -3,8 +3,10 @@
 Local fork of `@colbymchenry/codegraph` (tree-sitter → SQLite code graph, CLI + MCP) kept
 for one purpose: indexing this workspace's repositories, including Era games through the
 fork's own Era adapter (ERB + ontology CSV + engine profile — see `docs/era.md`; the
-adapter is why this fork exists). Upstream publishing infrastructure, its test suite, the
-Rust kernel experiment, and unused language grammars were removed; git history has them.
+adapter is why this fork exists). Upstream publishing infrastructure, self-upgrade,
+telemetry, its test suite, the Rust kernel experiment, and unused language grammars were
+removed; git history has them. The agent-config installer remains because CLI + MCP setup
+is a live local consumer.
 Facts ledger: `.project/ledger.jsonl` (append one JSON line per durable ruling).
 
 ## Working rules
@@ -22,7 +24,10 @@ Facts ledger: `.project/ledger.jsonl` (append one JSON line per durable ruling).
 
 ## Last Verified
 
-2026-08-27: after the collapse review (site, telemetry worker, installers, CI, upstream
-test suite and eval harness, Rust kernel with its four grammar trees, 22 unused vendored
-wasms, and upstream docs removed; package scripts and dev-deps trimmed) `npm run build`
-and the self-index witness are green.
+2026-08-28: the installed `codegraph` command and Codex MCP config proved the local CLI,
+MCP server, and agent-config installer are live consumers. Remote update checks,
+self-upgrade, telemetry, and the beta signup were removed so the Era adapter cannot be
+silently replaced by an upstream release. `npm run build` starts from a clean `dist/`;
+the build, MCP handshake, agent-config printout, and self-index witness are green. The
+verified build is deployed to the command on PATH; re-indexing the existing `eym` graph
+produced 1,239 `erabasic` files, 283 `eracsv` files, and working dynamic call paths.

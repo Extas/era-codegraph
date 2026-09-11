@@ -28,8 +28,6 @@ import type { AgentTarget, Location, TargetId } from './targets/types';
 import { watchDisabledReason } from '../sync/watch-policy';
 import { isGitRepo, isSyncHookInstalled, installGitSyncHook } from '../sync/git-hooks';
 import { getCodeGraphDir, codeGraphDirName } from '../directory';
-import { getTelemetry, TELEMETRY_DOCS } from '../telemetry';
-import { maybeOfferBetaSignup } from './beta-signup';
 
 // Backwards-compat: keep these named exports — downstream code may
 // import them. The shim in `config-writer.ts` continues to re-export
@@ -181,30 +179,7 @@ export async function runInstallerWithOptions(opts: RunInstallerOptions): Promis
     autoAllow = false;
   }
 
-  // Step 4½: anonymous usage telemetry — a visible default-on toggle, asked
-  // exactly once. Skipped when an env var (DO_NOT_TRACK / CODEGRAPH_TELEMETRY)
-  // already decides, or when a previous run stored a choice — re-runs and
-  // upgrades never re-ask.
-  if (!useDefaults && getTelemetry().getStatus().decidedBy === 'default' && !getTelemetry().hasStoredChoice()) {
-    const share = await clack.confirm({
-      message: 'Share anonymous usage stats? (No code, paths, or names — see TELEMETRY.md)',
-      initialValue: true,
-    });
-    if (clack.isCancel(share)) {
-      // Don't kill the install over the telemetry question — leave it
-      // undecided (the documented default + first-run notice applies later).
-      clack.log.info('Skipped — manage anytime with `codegraph telemetry on|off`.');
-    } else {
-      getTelemetry().setEnabled(share, 'installer');
-      clack.log.info(
-        share
-          ? `Thanks! Exactly what is collected: ${TELEMETRY_DOCS}`
-          : 'Telemetry disabled — nothing will be collected or sent.',
-      );
-    }
-  }
-
-  // Step 4¾: front-load prompt hook (Claude Code only). A UserPromptSubmit hook
+  // Step 4½: front-load prompt hook (Claude Code only). A UserPromptSubmit hook
   // that runs `codegraph prompt-hook` — it injects codegraph_explore context on
   // structural ("how / where / trace / impact") prompts so the agent reliably
   // reaches for the graph instead of grepping. Opt-in, default-yes. Only Claude
@@ -230,9 +205,6 @@ export async function runInstallerWithOptions(opts: RunInstallerOptions): Promis
   }
 
   // Step 5: per-target install loop.
-  const installedIds: TargetId[] = [];
-  let sawCreated = false;
-  let sawUpdated = false;
   for (const target of targets) {
     if (!target.supportsLocation(location)) {
       clack.log.warn(
@@ -241,10 +213,7 @@ export async function runInstallerWithOptions(opts: RunInstallerOptions): Promis
       continue;
     }
     const result = target.install(location, { autoAllow, promptHook });
-    installedIds.push(target.id);
     for (const file of result.files) {
-      if (file.action === 'created') sawCreated = true;
-      if (file.action === 'updated') sawUpdated = true;
       const verb = file.action === 'unchanged'
         ? 'Unchanged'
         : file.action === 'created' ? 'Created'
@@ -257,28 +226,7 @@ export async function runInstallerWithOptions(opts: RunInstallerOptions): Promis
     }
   }
 
-  // Telemetry: which agents were configured, where, fresh-vs-upgrade (derived
-  // from the file actions above). Target IDs and the location enum only.
-  if (installedIds.length > 0) {
-    getTelemetry().recordLifecycle('install', {
-      targets: installedIds,
-      scope: location,
-      kind: sawCreated ? 'fresh' : sawUpdated ? 'upgrade' : 'reinstall',
-    });
-  }
-
-  // Step 5½: CodeGraph Pro beta opt-in — the same waitlist as the
-  // getcodegraph.com homepage form, offered once per machine at the end of a
-  // successful install (and after `codegraph upgrade` — the shared gate in
-  // maybeOfferBetaSignup means whichever asks first is the ONLY ask ever).
-  // Strictly opt-in (user answers yes AND types an email), never shown under
-  // --yes, and any yes/no answer is stored so nothing re-asks. Cancel or a
-  // failed submit stores nothing, so a later install/upgrade may offer again.
-  if (!useDefaults && installedIds.length > 0) {
-    await maybeOfferBetaSignup({ source: 'cli-install' });
-  }
-
-  // Step 6: install wires up agents only — it deliberately does NOT index.
+  // Step 5: install wires up agents only — it deliberately does NOT index.
   // Building the per-project graph is the user's explicit `codegraph init`
   // (or `index`), so they choose what gets indexed and when, and we never
   // index a surprise directory (e.g. a shell sitting in $HOME). Same next step
@@ -289,10 +237,6 @@ export async function runInstallerWithOptions(opts: RunInstallerOptions): Promis
       : 'cd <your-project>\ncodegraph init        # build a project’s graph (one time; auto-syncs after)',
     'Next: index a project',
   );
-
-  // Deliver buffered telemetry while we're already in a long interactive
-  // command — bounded (~1.5s worst case), invisible after a multi-second install.
-  await getTelemetry().flushNow();
 
   const finalNote = targets.length > 0
     ? `Done! Restart your agent${targets.length > 1 ? 's' : ''} to use CodeGraph.`
@@ -525,7 +469,7 @@ export async function runUninstaller(opts: RunUninstallerOptions): Promise<void>
   let cliRemoved = false;
   if (location === 'global' && opts.keepCli !== true && opts.cliFilename) {
     const { planBinaryRemoval, executeBinaryRemoval, defaultProbes } =
-      await import('../upgrade/remove-binary');
+      await import('./remove-binary');
     const plan = planBinaryRemoval(defaultProbes(opts.cliFilename));
 
     if (plan.sourceRoot) {
@@ -563,13 +507,6 @@ export async function runUninstaller(opts: RunUninstallerOptions): Promise<void>
         clack.log.info('Kept the CLI. Remove it later with `codegraph uninstall` or `npm uninstall -g @colbymchenry/codegraph`.');
       }
     }
-  }
-
-  // Telemetry churn signal (agent IDs only) — flush now, since after an
-  // uninstall there is usually no "next run" to deliver it.
-  if (removed.length > 0) {
-    getTelemetry().recordLifecycle('uninstall', { targets: removed.map((r) => r.id) });
-    await getTelemetry().flushNow();
   }
 
   // Step 5: summary.

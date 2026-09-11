@@ -3,7 +3,7 @@
  *
  * Reaching one of these means a fault escaped every boundary (per-request
  * try/catch in the MCP transport, the file watcher's own `'error'` handlers,
- * telemetry's fail-silent contract) — i.e. the process is in an undefined
+ * other best-effort background work) — i.e. the process is in an undefined
  * state. Node's default in that case is to print and exit non-zero. The CLI
  * previously OVERRODE that to "log the error and keep running", which is the
  * bug behind two production incidents:

@@ -19,8 +19,6 @@ import { tools } from './tools';
 import { SERVER_INSTRUCTIONS, SERVER_INSTRUCTIONS_NO_ROOT_INDEX } from './server-instructions';
 import { CodeGraphPackageVersion } from './version';
 import { findNearestCodeGraphRoot } from '../directory';
-import { getTelemetry, ClientInfo } from '../telemetry';
-import { getUpdateNotice } from '../upgrade/update-check';
 
 /**
  * MCP Server Info — kept on the session because some clients log it. The
@@ -32,27 +30,6 @@ export const SERVER_INFO = {
   name: 'codegraph',
   version: CodeGraphPackageVersion,
 };
-
-/**
- * Instructions for the `initialize` response, with the update-availability
- * notice appended when one is known (#1243). Exported so the proxy's local
- * handshake sends the IDENTICAL payload — same convention as SERVER_INFO.
- * `getUpdateNotice` is a memoized synchronous cache read, so the #172
- * respond-fast contract holds; when no notice exists the instructions are
- * byte-identical to the bare constants.
- *
- * Test-authoring note: on a machine whose real `~/.codegraph` cache knows a
- * newer release, spawned servers append the notice — a test asserting exact
- * instructions equality must set `CODEGRAPH_NO_UPDATE_CHECK=1` in the spawn
- * env or it will fail only in the weeks after a release ships.
- */
-export function initializeInstructions(base: string, notice: string | null = getUpdateNotice()): string {
-  if (!notice) return base;
-  return (
-    `${base}\n\n---\n${notice} This server keeps running the old version until ` +
-    `the user upgrades — mention it when convenient; do not run the upgrade yourself.`
-  );
-}
 
 /** MCP Protocol Version (latest the server claims). */
 export const PROTOCOL_VERSION = '2024-11-05';
@@ -105,8 +82,6 @@ export interface MCPSessionOptions {
  */
 export class MCPSession {
   private clientSupportsRoots = false;
-  /** From the initialize handshake — attributes usage rollups to the agent host. */
-  private clientInfo: ClientInfo | undefined;
   private rootsAttempted = false;
   private resolvePromise: Promise<void> | null = null;
   private explicitProjectPath: string | null;
@@ -187,17 +162,9 @@ export class MCPSession {
       rootUri?: string;
       workspaceFolders?: Array<{ uri: string; name: string }>;
       capabilities?: { roots?: unknown };
-      clientInfo?: { name?: unknown; version?: unknown };
     } | undefined;
 
     this.clientSupportsRoots = !!params?.capabilities?.roots;
-    if (params?.clientInfo) {
-      this.clientInfo = {
-        name: typeof params.clientInfo.name === 'string' ? params.clientInfo.name : undefined,
-        version: typeof params.clientInfo.version === 'string' ? params.clientInfo.version : undefined,
-      };
-    }
-
     // Explicit project signal, strongest first: client-provided rootUri /
     // workspaceFolders (LSP-style), else the --path the server was launched
     // with. cwd is NOT used here — we defer it so a roots/list answer can
@@ -229,7 +196,7 @@ export class MCPSession {
       protocolVersion: PROTOCOL_VERSION,
       capabilities: { tools: {} },
       serverInfo: SERVER_INFO,
-      instructions: initializeInstructions(indexed ? SERVER_INSTRUCTIONS : SERVER_INSTRUCTIONS_NO_ROOT_INDEX),
+      instructions: indexed ? SERVER_INSTRUCTIONS : SERVER_INSTRUCTIONS_NO_ROOT_INDEX,
     });
 
     if (explicitPath) {
@@ -289,9 +256,6 @@ export class MCPSession {
     const result = await this.engine.getToolHandler().execute(toolName, toolArgs);
     if (process.env.CODEGRAPH_MCP_DEBUG) process.stderr.write(`[mcp-debug] toolsCall ${toolName} id=${String(request.id)} done\n`);
     this.transport.sendResult(request.id, result);
-    // After the reply is on the wire — telemetry must never delay a tool
-    // response (in-memory increment only; see src/telemetry).
-    getTelemetry().recordUsage('mcp_tool', toolName, !result.isError, this.clientInfo);
   }
 
   /**

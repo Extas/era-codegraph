@@ -648,7 +648,7 @@ export class CodeGraph {
         }
 
         // Stamp the index with the engine that built it, so `codegraph status`
-        // and `codegraph upgrade` can recommend a re-index when the running
+        // and a new binary can recommend a re-index when the running
         // engine produces richer extraction than the one on disk. Only on a
         // real full index — a sync touches a subset, so it must NOT advance the
         // extraction stamp (the bulk would still be stale). See extraction-version.ts.
@@ -1118,7 +1118,7 @@ export class CodeGraph {
    * older than the one now running — i.e. a re-index would add data a migration
    * can't backfill. False when there's no index yet (nothing to refresh) or the
    * stamp is current. This is the signal behind `codegraph status`'s re-index
-   * hint and `codegraph upgrade`'s reminder.
+   * hint and the extraction-version reminder.
    */
   isIndexStale(): boolean {
     if (this.queries.getLastIndexedAt() == null) return false;

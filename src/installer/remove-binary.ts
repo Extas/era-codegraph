@@ -13,7 +13,7 @@
  * This module makes `codegraph uninstall` complete: PLAN every binary
  * install present on the machine (bundle layout(s), the npm global package,
  * the bin-dir shim), then EXECUTE the removals. Split planner/executor with
- * injected side effects, same convention as the upgrade orchestrator.
+ * injected side effects.
  *
  * Safety rules:
  *   - A source checkout is REPORTED, never deleted — a git repo is the
@@ -21,24 +21,89 @@
  *   - A project-local npm install is left alone — the project's
  *     package.json owns it, not the machine-level uninstaller.
  *   - On unix the default install dir (`~/.codegraph`) doubles as the
- *     machine-level state dir (telemetry choice, daemon records, the
- *     update-check cache) — only the install ARTIFACTS (`versions/`,
+ *     machine-level state dir (including daemon records) — only the install ARTIFACTS (`versions/`,
  *     `current`) are removed there, never the whole dir. A dedicated
  *     install dir (Windows `%LOCALAPPDATA%\codegraph`, or a custom
  *     `CODEGRAPH_INSTALL_DIR`) is removed wholesale.
  *   - The bin-dir shim is removed only when it verifiably points into a
  *     detected install dir — a user's unrelated `codegraph` file survives.
  *   - Windows cannot DELETE a running exe but CAN rename it (the same
- *     trick the in-place upgrade uses): a locked `node.exe` is renamed
- *     aside and reported as a leftover for the user to delete after the
- *     window closes, instead of failing the whole removal.
+ *     trick): a locked `node.exe` is renamed aside and reported as a leftover
+ *     for the user to delete after the window closes, instead of failing the
+ *     whole removal.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { spawnSync } from 'child_process';
-import { detectInstallMethod, npmInvocation, NPM_PACKAGE } from './index';
+
+const NPM_PACKAGE = '@colbymchenry/codegraph';
+
+type InstallMethod =
+  | { kind: 'bundle'; os: 'unix' | 'windows'; bundleRoot: string; installDir: string | null }
+  | { kind: 'npm'; scope: 'global' | 'local' }
+  | { kind: 'npx' }
+  | { kind: 'source'; root: string }
+  | { kind: 'unknown'; reason: string };
+
+function toPosix(value: string): string {
+  return value.replace(/\\/g, '/');
+}
+
+function deriveInstallDir(
+  bundleRoot: string,
+  platform: 'unix' | 'windows',
+  exists: (candidate: string) => boolean,
+): string | null {
+  const P = platform === 'windows' ? path.win32 : path.posix;
+  if (platform === 'windows') {
+    return P.basename(bundleRoot).toLowerCase() === 'current' ? P.dirname(bundleRoot) : null;
+  }
+  const versionsDir = P.dirname(bundleRoot);
+  if (P.basename(versionsDir) !== 'versions') return null;
+  const installDir = P.dirname(versionsDir);
+  return exists(installDir) ? installDir : null;
+}
+
+function detectInstallMethod(input: {
+  filename: string;
+  platform: NodeJS.Platform;
+  cwd: string;
+  exists?: (candidate: string) => boolean;
+}): InstallMethod {
+  const exists = input.exists ?? fs.existsSync;
+  const isWindows = input.platform === 'win32';
+  const P = isWindows ? path.win32 : path.posix;
+  const normalized = toPosix(input.filename);
+  if (normalized.includes('/_npx/')) return { kind: 'npx' };
+  if (normalized.includes('/node_modules/')) {
+    const localPrefix = `${toPosix(P.resolve(input.cwd))}/`;
+    return { kind: 'npm', scope: normalized.startsWith(localPrefix) ? 'local' : 'global' };
+  }
+
+  const binDir = P.dirname(input.filename);
+  const bundleRoot = P.resolve(binDir, '..', '..', '..');
+  const vendoredNode = P.join(bundleRoot, isWindows ? 'node.exe' : 'node');
+  const launcher = P.join(bundleRoot, 'bin', isWindows ? 'codegraph.cmd' : 'codegraph');
+  if (exists(vendoredNode) && exists(launcher)) {
+    const platform = isWindows ? 'windows' : 'unix';
+    return { kind: 'bundle', os: platform, bundleRoot, installDir: deriveInstallDir(bundleRoot, platform, exists) };
+  }
+
+  const sourceRoot = P.resolve(binDir, '..', '..');
+  if (exists(P.join(sourceRoot, 'package.json')) && exists(P.join(sourceRoot, '.git'))) {
+    return { kind: 'source', root: sourceRoot };
+  }
+  return { kind: 'unknown', reason: `unrecognized install layout at ${input.filename}` };
+}
+
+function npmInvocation(platform: NodeJS.Platform, npmArgs: string[]): { cmd: string; args: string[] } {
+  if (platform === 'win32') {
+    return { cmd: 'cmd.exe', args: ['/d', '/s', '/c', ['npm', ...npmArgs].join(' ')] };
+  }
+  return { cmd: 'npm', args: npmArgs };
+}
 
 // ---------------------------------------------------------------------------
 // Planner (pure — every probe injected)
