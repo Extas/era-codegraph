@@ -21,10 +21,22 @@
  * 9. db/queries.ts appends the unresolved-reference prefix query if needed.
  * 10. extraction/extraction-version.ts is upstream + 1.
  * 11. AGENTS.md carries only the fork synchronization/deployment rules.
+ * 12. upgrade/update-check.ts and upgrade/index.ts: a deployed fork build
+ *     never checks for, nor installs, an upstream release (isEraBuild).
  */
 import * as path from 'path';
 import type { Language } from '../types';
+import { CodeGraphPackageVersion } from '../mcp/version';
 import { isEraCharaCsv, isEraOntologyCsv } from './profile';
+
+/**
+ * True for an install made by scripts/era/deploy.ps1, which stamps the version
+ * `<upstream>-era.<sha>`. Such an install must never be replaced by an upstream
+ * release: that would silently drop the Era adapter.
+ */
+export function isEraBuild(): boolean {
+  return CodeGraphPackageVersion.includes('-era.');
+}
 
 export { extractEraBasic } from './erb';
 export { extractEraCsv } from './csv';

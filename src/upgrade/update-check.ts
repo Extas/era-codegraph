@@ -33,6 +33,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { resolveLatestVersion, isUpdateAvailable, parseSemver } from './index';
 import { CodeGraphPackageVersion } from '../mcp/version';
+import { isEraBuild } from '../era';
 
 /** Re-check the release feed after this long (successful checks). */
 export const UPDATE_CHECK_TTL_MS = 24 * 60 * 60 * 1000;
@@ -87,7 +88,7 @@ function envTruthy(raw: string | undefined): boolean {
  * notice. `DO_NOT_TRACK` uses the same truthiness the telemetry opt-out does.
  */
 export function updateCheckDisabled(env: NodeJS.ProcessEnv = process.env): boolean {
-  return envTruthy(env.CODEGRAPH_NO_UPDATE_CHECK) || envTruthy(env.DO_NOT_TRACK);
+  return envTruthy(env.CODEGRAPH_NO_UPDATE_CHECK) || envTruthy(env.DO_NOT_TRACK) || isEraBuild();
 }
 
 export function updateCheckCachePath(dir: string): string {
