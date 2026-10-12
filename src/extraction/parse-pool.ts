@@ -61,6 +61,8 @@ const MAX_PARSE_POOL_SIZE = 16;
 const DEFAULT_RECYCLE_INTERVAL = 250;
 /** Base per-parse timeout; scaled up for large files by the caller's formula. */
 const DEFAULT_PARSE_TIMEOUT_MS = 10_000;
+/** Keep the default large-file budget bounded; the hard-kill window is 3× this. */
+const MAX_SCALED_PARSE_TIMEOUT_MS = 20_000;
 /**
  * A worker is only killed once a parse has gone this many × its budget with no
  * result. The base timer firing is NOT proof the parse is still running: after
@@ -73,6 +75,16 @@ const DEFAULT_PARSE_TIMEOUT_MS = 10_000;
  * only a worker that stays silent the whole window is treated as hung.
  */
 const HARD_KILL_MULTIPLIER = 3;
+/**
+ * How long `destroy()` waits for a worker that is still starting up — loading
+ * its modules, then its grammars — before terminating it anyway. Terminating a
+ * worker while it is still loading its modules can take the whole process down
+ * with an access violation (0xC0000005, seen on Windows): a pool torn down
+ * right after a short index often has a late-spawned worker in exactly that
+ * state. A start finishes in well under a second normally and a few seconds
+ * under heavy load; the cap only bounds a start that is wedged.
+ */
+const GRAMMAR_LOAD_SETTLE_MS = 15_000;
 /**
  * Max workers cold-starting at once. A worker's cold start is heavy (module load
  * + grammar WASM compile); starting the whole pool simultaneously thrashes CPU.
@@ -107,6 +119,17 @@ export function resolveParseTimeoutMs(envVal: string | undefined): number {
     if (Number.isFinite(n) && n > 0) return Math.floor(n);
   }
   return DEFAULT_PARSE_TIMEOUT_MS;
+}
+
+/**
+ * Per-file soft timeout. Size scaling helps legitimate large sources, but an
+ * uncapped linear budget gave data-only headers near the 1 MiB file limit a
+ * 4.5–5 minute hard-kill window (#1555). Explicit larger base overrides remain
+ * respected for slow storage.
+ */
+export function resolveParseBudgetMs(baseMs: number, contentLength: number): number {
+  const scaled = baseMs + Math.floor(contentLength / 100_000) * 10_000;
+  return Math.min(scaled, Math.max(baseMs, MAX_SCALED_PARSE_TIMEOUT_MS));
 }
 
 export function resolveParsePoolSize(envVal: string | undefined, cpuCount: number): number {
@@ -156,6 +179,8 @@ export interface ParseWorkerPoolOptions {
   parseTimeoutMs?: number;
   /** Worker factory (tests inject a fake). Defaults to a real `worker_threads` Worker. */
   createWorker?: () => ParsePoolWorker;
+  /** How long destroy() waits on a worker still loading grammars (tests shorten it). Default 15s. */
+  loadSettleMs?: number;
   /** Optional verbose logger (the orchestrator's `[worker] …` logger). */
   log?: (msg: string) => void;
   /**
@@ -177,6 +202,10 @@ export class ParseWorkerPool {
   // Spawned but not yet 'grammars-loaded'. Growth counts these so a single first
   // parse doesn't spawn the whole pool before the eager worker reports ready.
   private pending = new Set<ParsePoolWorker>();
+  // Each worker's grammar load, settled when it reports 'grammars-loaded' or
+  // goes away — what destroy() waits on before terminating it (see
+  // GRAMMAR_LOAD_SETTLE_MS).
+  private loads = new Map<ParsePoolWorker, { settled: Promise<void>; settle: () => void }>();
   private parseCounts = new Map<ParsePoolWorker, number>();
   private nextId = 1;
   private totalCrashes = 0;
@@ -187,6 +216,7 @@ export class ParseWorkerPool {
   private readonly recycleInterval: number;
   private readonly parseTimeoutMs: number;
   private readonly createWorker: () => ParsePoolWorker;
+  private readonly loadSettleMs: number;
   private readonly log: (msg: string) => void;
   private readonly grammarBuffers?: Record<string, Uint8Array>;
 
@@ -196,11 +226,18 @@ export class ParseWorkerPool {
     this.maxSize = Math.max(1, Math.min(opts.size, MAX_PARSE_POOL_SIZE));
     this.recycleInterval = opts.recycleInterval ?? DEFAULT_RECYCLE_INTERVAL;
     this.parseTimeoutMs = opts.parseTimeoutMs ?? DEFAULT_PARSE_TIMEOUT_MS;
+    this.loadSettleMs = opts.loadSettleMs ?? GRAMMAR_LOAD_SETTLE_MS;
     this.log = opts.log ?? (() => {});
     if (opts.createWorker) {
       this.createWorker = opts.createWorker;
     } else if (opts.workerScriptPath) {
       const scriptPath = opts.workerScriptPath;
+      // Deliberately no `resourceLimits.stackSizeMb`: a bigger worker stack
+      // only moves the cliff a deeply nested file falls off (#1581 — the
+      // 8 MiB main thread still dies at 100k levels). The native kernel
+      // guards its own recursion against THIS thread's real stack bounds
+      // (codegraph-kernel/src/stack.rs) and defers such a file to the wasm
+      // path, which catches its JS RangeError per file.
       this.createWorker = () => new Worker(scriptPath);
     } else {
       throw new Error('ParseWorkerPool requires workerScriptPath or createWorker');
@@ -259,9 +296,12 @@ export class ParseWorkerPool {
     this.workers.add(w);
     this.pending.add(w);
     this.parseCounts.set(w, 0);
+    let settle!: () => void;
+    const settled = new Promise<void>((resolve) => { settle = resolve; });
+    this.loads.set(w, { settled, settle });
     w.on('message', (m) => this.onMessage(w, (m ?? {}) as ParseWorkerMessage));
-    w.on('error', (e) => this.onWorkerGone(w, `Worker error: ${e?.message ?? 'unknown'}`));
-    w.on('exit', (code) => { if (code !== 0) this.onWorkerGone(w, `Worker exited with code ${code}`); });
+    w.on('error', (e) => { this.loadSettled(w); this.onWorkerGone(w, `Worker error: ${e?.message ?? 'unknown'}`); });
+    w.on('exit', (code) => { this.loadSettled(w); if (code !== 0) this.onWorkerGone(w, `Worker exited with code ${code}`); });
     // Load grammars; the worker replies 'grammars-loaded' and only then is idle.
     // Pre-read WASM bytes (when the orchestrator provided them) make this a
     // memory load instead of a per-spawn disk read.
@@ -270,6 +310,7 @@ export class ParseWorkerPool {
 
   private onMessage(w: ParsePoolWorker, m: ParseWorkerMessage): void {
     if (m.type === 'grammars-loaded') {
+      this.loadSettled(w);
       if (!this.workers.has(w)) return; // recycled/destroyed before ready
       this.pending.delete(w);
       this.idle.push(w);
@@ -332,6 +373,32 @@ export class ParseWorkerPool {
     if (this.healthy && !this.destroyed) this.spawnOne();
   }
 
+  /** The worker's grammar load is over: it reported ready, errored or exited. */
+  private loadSettled(w: ParsePoolWorker): void {
+    const load = this.loads.get(w);
+    if (!load) return;
+    this.loads.delete(w);
+    load.settle();
+  }
+
+  /**
+   * Terminate a worker, but not while it is still loading grammars: wait for
+   * the load to finish (or the worker to go away), up to `loadSettleMs`
+   * (GRAMMAR_LOAD_SETTLE_MS — see that constant for the crash this avoids).
+   */
+  private async terminateSettled(w: ParsePoolWorker): Promise<void> {
+    const load = this.loads.get(w);
+    if (load) {
+      let cap: NodeJS.Timeout | undefined;
+      await Promise.race([
+        load.settled,
+        new Promise<void>((resolve) => { cap = setTimeout(resolve, this.loadSettleMs); cap.unref?.(); }),
+      ]);
+      clearTimeout(cap);
+    }
+    try { await w.terminate(); } catch { /* already gone */ }
+  }
+
   private removeWorker(w: ParsePoolWorker): void {
     this.workers.delete(w);
     this.pending.delete(w);
@@ -344,7 +411,7 @@ export class ParseWorkerPool {
     this.parseCounts.set(w, (this.parseCounts.get(w) ?? 0) + 1);
     // Scale the timeout for large files: base + 10s per 100KB (matches the
     // original single-worker formula so pathological-file behaviour is unchanged).
-    const timeoutMs = this.parseTimeoutMs + Math.floor(job.task.content.length / 100_000) * 10_000;
+    const timeoutMs = resolveParseBudgetMs(this.parseTimeoutMs, job.task.content.length);
     job.budgetMs = timeoutMs;
     job.timer = setTimeout(() => this.onTimeout(w, job, timeoutMs), timeoutMs);
     job.timer.unref?.();
@@ -452,6 +519,6 @@ export class ParseWorkerPool {
     }
     this.inflight.clear();
     this.queue = [];
-    await Promise.all(ws.map((w) => Promise.resolve(w.terminate()).catch(() => { /* already gone */ })));
+    await Promise.all(ws.map((w) => this.terminateSettled(w)));
   }
 }

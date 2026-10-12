@@ -42,6 +42,7 @@ export const NODE_KINDS = [
   'export',
   'route',
   'component',
+  'union',
 ] as const;
 
 export type NodeKind = (typeof NODE_KINDS)[number];
@@ -66,14 +67,7 @@ export const EDGE_KINDS = [
   'instantiates',    // Creates instance of class
   'overrides',       // Method overrides parent method
   'decorates',       // Decorator applied to symbol
-  // Data-flow direction. `references` cannot express it, and for a language
-  // built entirely on shared mutable state ("who writes ABL:顺从, and who
-  // reads it afterwards") the direction IS the question. It has to be the
-  // edge kind rather than metadata: only `kind` is indexed
-  // (idx_edges_kind / _source_kind / _target_kind), so a metadata flag would
-  // turn every such query into a full scan.
-  'reads',           // Function reads a variable or named slot
-  'writes',          // Function writes a variable or named slot
+  'navigates',       // Navigates to a screen/route (Expo Router `router.push('/x')`)
 ] as const;
 
 export type EdgeKind = (typeof EDGE_KINDS)[number];
@@ -124,10 +118,6 @@ export const LANGUAGES = [
   'vbnet',
   'erlang',
   'terraform',
-  // EraBasic scripts (.ERB/.ERH) and the ontology CSVs an Era game loads.
-  // Both use grammarless custom extractors; see src/extraction/era.
-  'erabasic',
-  'eracsv',
   'unknown',
 ] as const;
 
@@ -264,6 +254,33 @@ export interface FileRecord {
 
   /** Any extraction errors */
   errors?: ExtractionError[];
+
+  /**
+   * Tool-generated source, decided at index time from the filename
+   * convention OR a generation banner in the file's header (see
+   * extraction/generated-detection.ts). A relevance hint for ranking, not a
+   * hard filter. Absent on indexes built before schema v9 — treat
+   * `undefined` as "content signal unknown, fall back to the path check".
+   */
+  generated?: boolean;
+}
+
+/**
+ * Indexed files whose symbols are missing even though their content hash is
+ * current — what a hash comparison alone calls "up to date" (#2336). Paths are
+ * project-relative and sorted.
+ */
+export interface IndexHealth {
+  /**
+   * Files `sync` re-indexes: stored while their grammar could not load (#2335)
+   * or stored with no nodes and no recorded reason (#1541).
+   */
+  needsReindex: string[];
+  /**
+   * Files with a recorded parse error and no symbols from it. Deterministic:
+   * they stay this way until the file (or the parser) changes.
+   */
+  parseErrors: string[];
 }
 
 // =============================================================================
@@ -690,4 +707,13 @@ export interface FindRelevantContextOptions {
 
   /** Node types to include */
   nodeKinds?: NodeKind[];
+
+  /**
+   * Extra symbol names to merge in as exact-name search candidates, at a
+   * dampened score. Fed by the segment-vocabulary supplement (CodeGraph.
+   * findRelevantContext): word-level query terms can't reach camelCase names
+   * through FTS — `pinFeedIfNearBottom` is one FTS token — so names whose
+   * SEGMENTS the query's words name are seeded here instead.
+   */
+  seedNames?: string[];
 }

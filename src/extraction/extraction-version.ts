@@ -11,7 +11,7 @@
  * *stale*: it's missing whatever a newer extractor would now produce. A schema
  * migration can't backfill that — only a re-index can. So this is the signal
  * `codegraph status` uses to recommend a re-index, and the reason `codegraph
- * binary can remind users to refresh their projects.
+ * upgrade` reminds users to refresh their projects.
  *
  * BUMP THIS when a release changes extraction output enough that existing
  * indexes should be rebuilt to benefit — e.g. a new language/framework
@@ -21,6 +21,4 @@
  * turns the re-index hint into noise — keep it honest (see CLAUDE.md, "Honesty
  * in the product is load-bearing").
  */
-// 25: Era adapter — EraBasic and ontology-CSV extractors, the `reads`/`writes`
-// edge kinds, and the interpolated-call dispatch synthesizer.
-export const EXTRACTION_VERSION = 25;
+export const EXTRACTION_VERSION = 28;
