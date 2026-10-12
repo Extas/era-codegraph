@@ -1,3 +1,9 @@
+> **Era fork.** Upstream `colbymchenry/codegraph` is the authority for everything
+> outside `src/era/`, which joins it through the seams listed in `src/era/index.ts`.
+> Sync: `git merge upstream/main`, resolve only seam lines, run
+> `npx vitest run __tests__/era.test.ts`, deploy with `pwsh scripts/era/deploy.ps1`.
+> Upstream's release, changelog, telemetry and full-suite rules below do not apply here.
+
 # AGENTS.md
 
 Canonical project guidance for coding agents working in this repository (Codex/Astra, Claude Code via `@AGENTS.md`, Cursor, etc.).

@@ -1,0 +1,4463 @@
+{
+  "schemaVersion": 1,
+  "id": "emuera-1824-ee55",
+  "derived": "source",
+  "engine": {
+    "path": "Emuera.exe",
+    "sha256": "b88278c40bc5f7f7e30e654cce79b3a42f8ecaa20c29b2909a9a782aec1b389f",
+    "fileVersion": "1.824.0.0",
+    "productVersion": "EEv55+MRv2"
+  },
+  "encoding": {
+    "primary": "utf-8",
+    "fallback": "shift_jis"
+  },
+  "csvFiles": [
+    "ABL.CSV",
+    "EXP.CSV",
+    "TALENT.CSV",
+    "PALAM.CSV",
+    "TRAIN.CSV",
+    "MARK.CSV",
+    "ITEM.CSV",
+    "BASE.CSV",
+    "SOURCE.CSV",
+    "EX.CSV",
+    "STR.CSV",
+    "EQUIP.CSV",
+    "TEQUIP.CSV",
+    "FLAG.CSV",
+    "TFLAG.CSV",
+    "CFLAG.CSV",
+    "TCVAR.CSV",
+    "CSTR.CSV",
+    "STAIN.CSV",
+    "CDFLAG1.CSV",
+    "CDFLAG2.CSV",
+    "STRNAME.CSV",
+    "TSTR.CSV",
+    "SAVESTR.CSV",
+    "GLOBAL.CSV",
+    "GLOBALS.CSV",
+    "DAY.CSV",
+    "TIME.CSV",
+    "MONEY.CSV"
+  ],
+  "variables": [
+    {
+      "name": "A",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ABL",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "ABL.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "ABLNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ARG",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "local",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ARGS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "local",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ASSI",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ASSIPLAY",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "B",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "BASE",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "BASE.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "BASENAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "BOUGHT",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "C",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CALLNAME",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "chara*.csv",
+      "nameArgIndex": null
+    },
+    {
+      "name": "CDFLAG",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "CDFLAG1.CSV",
+      "nameArgIndex": null
+    },
+    {
+      "name": "CDFLAGNAME1",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": "CDFLAG1.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "CDFLAGNAME2",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": "CDFLAG2.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "CDOWN",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "CFLAG",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "CFLAG.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "CFLAGNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CHARANUM",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "COUNT",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CSTR",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "CSTR.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "CSTRNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CUP",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "CVAR",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CVAR2D",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CVARS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "CVARS2D",
+      "valueType": "string",
+      "dimensions": 2,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "D",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DA",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DAY",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "DAY.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "DAYNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DB",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DC",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DD",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DE",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DITEMTYPE",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "DOWN",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "DOWNBASE",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "BASE.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "DRAWLINESTR",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "E",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "EJAC",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "EMUERA_VERSION",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "EQUIP",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "EQUIP.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "EQUIPNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "EX",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "EX.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "EXNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "EXP",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "EXP.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "EXPLV",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "EXPNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "F",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "FLAG",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "FLAG.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "FLAGNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "G",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_ALLOWVERSION",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_AUTHER",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_AUTHOR",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_DEFAULTCHARA",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_GAMECODE",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_INFO",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_NOITEM",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_TITLE",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_URL",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_VERSION",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_VERSIONNAME",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GAMEBASE_YEAR",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GLOBAL",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "global",
+      "backingCsv": "GLOBAL.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "GLOBALNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GLOBALS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "global",
+      "backingCsv": "GLOBALS.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "GLOBALSNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "GOTJUEL",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "H",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "I",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ISASSI",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ISTIMEOUT",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ITEM",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "ITEM.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "ITEMNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "ITEMPRICE",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": "ITEM.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "ITEMSALES",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "ITEM.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "J",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "JUEL",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "K",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "L",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LASTLOAD_NO",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LASTLOAD_TEXT",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LASTLOAD_VERSION",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LINECOUNT",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LOCAL",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "local",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LOCALS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "local",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "LOSEBASE",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "BASE.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "M",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "MARK",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "MARK.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "MARKNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "MASTER",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "MASTERNAME",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "MAXBASE",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "BASE.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "MONEY",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "MONEY.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "MONEYLABEL",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "MONEYNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "N",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "NAME",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "chara*.csv",
+      "nameArgIndex": null
+    },
+    {
+      "name": "NEXTCOM",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "NICKNAME",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "NO",
+      "valueType": "int",
+      "dimensions": 0,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "NOITEM",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "NOWEX",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "EX.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "O",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "P",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "PALAM",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "PALAMLV",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "PALAMNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "PBAND",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "PLAYER",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "PREVCOM",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "Q",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "R",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "RAND",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "RANDDATA",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "REF",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "REF2D",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "REF3D",
+      "valueType": "int",
+      "dimensions": 3,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "REFS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "REFS2D",
+      "valueType": "string",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "REFS3D",
+      "valueType": "string",
+      "dimensions": 3,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "RELATION",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "chara*.csv",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "RESULT",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "RESULTS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "S",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "SAVEDATA_TEXT",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "SAVESTR",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "SAVESTR.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "SAVESTRNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "SELECTCOM",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "SOURCE",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "SOURCE.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "SOURCENAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "STAIN",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "STAIN.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "STAINNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "STR",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "STRNAME.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "STRNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "T",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TA",
+      "valueType": "int",
+      "dimensions": 3,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TALENT",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "TALENT.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "TALENTNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TARGET",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TB",
+      "valueType": "int",
+      "dimensions": 3,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TCVAR",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "TCVAR.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "TCVARNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TEQUIP",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": true,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "TEQUIP.CSV",
+      "nameArgIndex": 1
+    },
+    {
+      "name": "TEQUIPNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TFLAG",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "TFLAG.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "TFLAGNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TIME",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "TIME.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "TIMENAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "TRAINNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": "TRAIN.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "TSTR",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "TSTR.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "TSTRNAME",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "U",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "UP",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": "PALAM.CSV",
+      "nameArgIndex": 0
+    },
+    {
+      "name": "V",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "VAR",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "VAR2D",
+      "valueType": "int",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "VAR3D",
+      "valueType": "int",
+      "dimensions": 3,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "VARS",
+      "valueType": "string",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "VARS2D",
+      "valueType": "string",
+      "dimensions": 2,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "VARS3D",
+      "valueType": "string",
+      "dimensions": 3,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "W",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "WINDOW_TITLE",
+      "valueType": "string",
+      "dimensions": 0,
+      "perCharacter": false,
+      "readOnly": true,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "X",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "Y",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    },
+    {
+      "name": "Z",
+      "valueType": "int",
+      "dimensions": 1,
+      "perCharacter": false,
+      "readOnly": false,
+      "scope": "save",
+      "backingCsv": null,
+      "nameArgIndex": null
+    }
+  ],
+  "instructions": [
+    {
+      "name": "ADDCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ADDCOPYCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ADDDEFCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ADDSPCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ADDVOIDCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ALIGNMENT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ARRAYCOPY",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ARRAYREMOVE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ARRAYSHIFT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ARRAYSORT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ASSERT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "AWAIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "BAR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "BARL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "BEGIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "BINPUT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "BINPUTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "BREAK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALL",
+      "kind": "call",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALLEVENT",
+      "kind": "event",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALLF",
+      "kind": "callf",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALLFORM",
+      "kind": "call",
+      "isForm": true,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALLFORMF",
+      "kind": "callf",
+      "isForm": true,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALLSHARP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CALLTRAIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CASE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CASEELSE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CATCH",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CLEARBGIMAGE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CLEARBIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CLEARLINE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CLEARTEXTBOX",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CONTINUE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "COPYCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CUPCHECK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CUSTOMDRAWLINE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "CVARSET",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DATAFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DATALIST",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DEBUGCLEAR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DEBUGPRINT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DEBUGPRINTFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DEBUGPRINTFORML",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DEBUGPRINTL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DELALLCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DELCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DELDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DO",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DOTRAIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DRAWLINE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DRAWLINEFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DT_COLUMN_OPTIONS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "DUMPRAND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ELSE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ELSEIF",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENCODETOUNI",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDCATCH",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDFUNC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDIF",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDLIST",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDNOSKIP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ENDSELECT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FONTBOLD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FONTITALIC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FONTREGULAR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FONTSTYLE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FOR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FORCE_BEGIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FORCE_QUIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FORCE_QUIT_AND_RESTART",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FORCEKANA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FORCEWAIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "FUNC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "GETTIME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "GOTO",
+      "kind": "goto",
+      "isForm": false,
+      "isJump": true,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "GOTOFORM",
+      "kind": "goto",
+      "isForm": true,
+      "isJump": true,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "HTML_PRINT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "HTML_PRINT_ISLAND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "HTML_PRINT_ISLAND_CLEAR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "HTML_TAGSPLIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "IF",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "INITRAND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "INPUT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "INPUTANY",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "INPUTMOUSEKEY",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "INPUTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "INVERTBIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "JUMP",
+      "kind": "call",
+      "isForm": false,
+      "isJump": true,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "JUMPFORM",
+      "kind": "call",
+      "isForm": true,
+      "isJump": true,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "LOADCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "LOADDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "LOADGAME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "LOADGLOBAL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "LOADVAR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "LOOP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "NEXT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "NOSKIP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ONEBINPUT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ONEBINPUTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ONEINPUT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "ONEINPUTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PICKUPCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PLAYBGM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PLAYSOUND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "POWER",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_ABL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_EXP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_IMG",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_ITEM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_MARK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_PALAM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_RECT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_SHOPITEM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_SPACE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINT_TALENT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTBUTTON",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTBUTTONC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTBUTTONLC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTCD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTCK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTCPERLINE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATAD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATADL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATADW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATAK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATAKL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATAKW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATAL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDATAW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTDW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMCD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMCK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMDL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMDW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMKL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMKW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORML",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMLC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMLCD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMLCK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSDL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSDW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSKL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSKW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMSW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTFORMW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTKL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTKW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTLC",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTLCD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTLCK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTPLAIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTPLAINFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSDL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSDW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLED",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEFORMD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEFORMK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEFORMS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEFORMSD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEFORMSK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLES",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLESD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLESK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEV",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEVD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSINGLEVK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSKL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSKW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTSW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTV",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVD",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVDL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVDW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVKL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVKW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTVW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PRINTW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "PUTFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "QUIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "QUIT_AND_RESTART",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RANDOMIZE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REDRAW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REF",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REFBYNAME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REMOVEBGIMAGE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REPEAT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RESET_STAIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RESETBGCOLOR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RESETCOLOR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RESETDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RESETGLOBAL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RESTART",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RETURN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RETURNF",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "RETURNFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "REUSELASTLINE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SAVECHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SAVEDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SAVEGAME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SAVEGLOBAL",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SAVENOS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SAVEVAR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SELECTCASE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SET",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETBGCOLOR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETBGCOLORBYNAME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETBGIMAGE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETBGMVOLUME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETBIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETCOLOR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETCOLORBYNAME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETFONT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SETSOUNDVOLUME",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SIF",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SKIPDISP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SKIPLOG",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SORTCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SPLIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STOPBGM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STOPCALLTRAIN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STOPSOUND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STRDATA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STRLEN",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STRLENFORM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STRLENFORMU",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "STRLENU",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SWAP",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "SWAPCHARA",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "THROW",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TIMES",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TINPUT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TINPUTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TONEINPUT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TONEINPUTS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_CUSTOM",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_FORMAT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_IMG",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_SETCOLOR",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_SETDELAY",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_SETDURATION",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_SETFONT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TOOLTIP_SETFONTSIZE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYCALL",
+      "kind": "call",
+      "isForm": false,
+      "isJump": false,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYCALLF",
+      "kind": "callf",
+      "isForm": false,
+      "isJump": false,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYCALLFORM",
+      "kind": "call",
+      "isForm": true,
+      "isJump": false,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYCALLFORMF",
+      "kind": "callf",
+      "isForm": true,
+      "isJump": false,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYCALLLIST",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYCCALL",
+      "kind": "call",
+      "isForm": false,
+      "isJump": false,
+      "isTry": true,
+      "isTryCatch": true
+    },
+    {
+      "name": "TRYCCALLFORM",
+      "kind": "call",
+      "isForm": true,
+      "isJump": false,
+      "isTry": true,
+      "isTryCatch": true
+    },
+    {
+      "name": "TRYCGOTO",
+      "kind": "goto",
+      "isForm": false,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": true
+    },
+    {
+      "name": "TRYCGOTOFORM",
+      "kind": "goto",
+      "isForm": true,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": true
+    },
+    {
+      "name": "TRYCJUMP",
+      "kind": "call",
+      "isForm": false,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": true
+    },
+    {
+      "name": "TRYCJUMPFORM",
+      "kind": "call",
+      "isForm": true,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": true
+    },
+    {
+      "name": "TRYGOTO",
+      "kind": "goto",
+      "isForm": false,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYGOTOFORM",
+      "kind": "goto",
+      "isForm": true,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYGOTOLIST",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYJUMP",
+      "kind": "call",
+      "isForm": false,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYJUMPFORM",
+      "kind": "call",
+      "isForm": true,
+      "isJump": true,
+      "isTry": true,
+      "isTryCatch": false
+    },
+    {
+      "name": "TRYJUMPLIST",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "TWAIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "UPCHECK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "UPDATECHECK",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "VARI",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "VARS",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "VARSET",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "VARSIZE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "WAIT",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "WAITANYKEY",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "WEND",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    },
+    {
+      "name": "WHILE",
+      "kind": "other",
+      "isForm": false,
+      "isJump": false,
+      "isTry": false,
+      "isTryCatch": false
+    }
+  ],
+  "methods": [
+    "ABS",
+    "ALLSAMES",
+    "ARRAYMSORT",
+    "ARRAYMSORTEX",
+    "BARSTR",
+    "BITMAP_CACHE_ENABLE",
+    "CBGCLEAR",
+    "CBGCLEARBUTTON",
+    "CBGREMOVEBMAP",
+    "CBGREMOVERANGE",
+    "CBGSETBMAPG",
+    "CBGSETBUTTONSPRITE",
+    "CBGSETG",
+    "CBGSETSPRITE",
+    "CBRT",
+    "CHARATU",
+    "CHKCHARADATA",
+    "CHKDATA",
+    "CHKFONT",
+    "CLEARMEMORY",
+    "CLIENTHEIGHT",
+    "CLIENTWIDTH",
+    "CMATCH",
+    "COLOR_FROMNAME",
+    "COLOR_FROMRGB",
+    "CONVERT",
+    "CSVABL",
+    "CSVBASE",
+    "CSVCALLNAME",
+    "CSVCFLAG",
+    "CSVCSTR",
+    "CSVEQUIP",
+    "CSVEXP",
+    "CSVJUEL",
+    "CSVMARK",
+    "CSVMASTERNAME",
+    "CSVNAME",
+    "CSVNICKNAME",
+    "CSVRELATION",
+    "CSVTALENT",
+    "CURRENTALIGN",
+    "CURRENTREDRAW",
+    "DT_CELL_GET",
+    "DT_CELL_GETS",
+    "DT_CELL_ISNULL",
+    "DT_CELL_SET",
+    "DT_CLEAR",
+    "DT_COLUMN_ADD",
+    "DT_COLUMN_EXIST",
+    "DT_COLUMN_LENGTH",
+    "DT_COLUMN_NAMES",
+    "DT_COLUMN_REMOVE",
+    "DT_CREATE",
+    "DT_EXIST",
+    "DT_FROMXML",
+    "DT_NOCASE",
+    "DT_RELEASE",
+    "DT_ROW_ADD",
+    "DT_ROW_LENGTH",
+    "DT_ROW_REMOVE",
+    "DT_ROW_SET",
+    "DT_SELECT",
+    "DT_TOXML",
+    "ENCODETOUNI",
+    "ENUMFILES",
+    "ENUMFUNCBEGINSWITH",
+    "ENUMFUNCENDSWITH",
+    "ENUMFUNCWITH",
+    "ENUMMACROBEGINSWITH",
+    "ENUMMACROENDSWITH",
+    "ENUMMACROWITH",
+    "ENUMVARBEGINSWITH",
+    "ENUMVARENDSWITH",
+    "ENUMVARWITH",
+    "ERDNAME",
+    "ESCAPE",
+    "EXISTCSV",
+    "EXISTFILE",
+    "EXISTFUNCTION",
+    "EXISTMETH",
+    "EXISTSOUND",
+    "EXISTVAR",
+    "EXPONENT",
+    "FINDCHARA",
+    "FINDELEMENT",
+    "FINDLASTCHARA",
+    "FINDLASTELEMENT",
+    "FIND_CHARADATA",
+    "FLOWINPUT",
+    "FLOWINPUTS",
+    "GCLEAR",
+    "GCREATE",
+    "GCREATED",
+    "GCREATEFROMFILE",
+    "GDASHSTYLE",
+    "GDISPOSE",
+    "GDRAWG",
+    "GDRAWGWITHMASK",
+    "GDRAWGWITHROTATE",
+    "GDRAWLINE",
+    "GDRAWSPRITE",
+    "GDRAWTEXT",
+    "GETBGCOLOR",
+    "GETBIT",
+    "GETCHARA",
+    "GETCOLOR",
+    "GETCONFIG",
+    "GETCONFIGS",
+    "GETDEFBGCOLOR",
+    "GETDEFCOLOR",
+    "GETDISPLAYLINE",
+    "GETDOINGFUNCTION",
+    "GETEXPLV",
+    "GETFOCUSCOLOR",
+    "GETFONT",
+    "GETKEY",
+    "GETKEYTRIGGERED",
+    "GETLINESTR",
+    "GETMEMORYUSAGE",
+    "GETMETH",
+    "GETMETHS",
+    "GETMILLISECOND",
+    "GETNUM",
+    "GETNUMB",
+    "GETPALAMLV",
+    "GETSECOND",
+    "GETSPCHARA",
+    "GETSTYLE",
+    "GETTEXTBOX",
+    "GETTIME",
+    "GETTIMES",
+    "GETVAR",
+    "GETVARS",
+    "GFILLRECTANGLE",
+    "GGETBRUSH",
+    "GGETCOLOR",
+    "GGETFONT",
+    "GGETFONTSIZE",
+    "GGETFONTSTYLE",
+    "GGETPEN",
+    "GGETPENWIDTH",
+    "GGETTEXTSIZE",
+    "GHEIGHT",
+    "GLOAD",
+    "GROUPMATCH",
+    "GSAVE",
+    "GSETBRUSH",
+    "GSETCOLOR",
+    "GSETFONT",
+    "GSETPEN",
+    "GWIDTH",
+    "HOTKEY_STATE",
+    "HOTKEY_STATE_INIT",
+    "HTML_ESCAPE",
+    "HTML_GETPRINTEDSTR",
+    "HTML_POPPRINTINGSTR",
+    "HTML_STRINGLEN",
+    "HTML_STRINGLINES",
+    "HTML_SUBSTRING",
+    "HTML_TOPLAINTEXT",
+    "INRANGE",
+    "INRANGEARRAY",
+    "INRANGECARRAY",
+    "ISACTIVE",
+    "ISDEFINED",
+    "ISNUMERIC",
+    "ISSKIP",
+    "LIMIT",
+    "LINEISEMPTY",
+    "LOADTEXT",
+    "LOG",
+    "LOG10",
+    "MAP_CLEAR",
+    "MAP_CREATE",
+    "MAP_EXIST",
+    "MAP_FROMXML",
+    "MAP_GET",
+    "MAP_GETKEYS",
+    "MAP_HAS",
+    "MAP_RELEASE",
+    "MAP_REMOVE",
+    "MAP_SET",
+    "MAP_SIZE",
+    "MAP_TOXML",
+    "MATCH",
+    "MAX",
+    "MAXARRAY",
+    "MAXCARRAY",
+    "MESSKIP",
+    "MIN",
+    "MINARRAY",
+    "MINCARRAY",
+    "MONEYSTR",
+    "MOUSEB",
+    "MOUSESKIP",
+    "MOUSEX",
+    "MOUSEY",
+    "MOVETEXTBOX",
+    "NOSAMES",
+    "OUTPUTLOG",
+    "POWER",
+    "PRINTCLENGTH",
+    "PRINTCPERLINE",
+    "RAND",
+    "REGEXPMATCH",
+    "REPLACE",
+    "RESUMETEXTBOX",
+    "SAVENOS",
+    "SAVETEXT",
+    "SETANIMETIMER",
+    "SETTEXTBOX",
+    "SETVAR",
+    "SIGN",
+    "SPRITEANIMEADDFRAME",
+    "SPRITEANIMECREATE",
+    "SPRITECREATE",
+    "SPRITECREATED",
+    "SPRITEDISPOSE",
+    "SPRITEDISPOSEALL",
+    "SPRITEGETCOLOR",
+    "SPRITEHEIGHT",
+    "SPRITEMOVE",
+    "SPRITEPOSX",
+    "SPRITEPOSY",
+    "SPRITESETPOS",
+    "SPRITEWIDTH",
+    "SQRT",
+    "STRCOUNT",
+    "STRFIND",
+    "STRFINDU",
+    "STRFORM",
+    "STRJOIN",
+    "STRLENS",
+    "STRLENSU",
+    "SUBSTRING",
+    "SUBSTRINGU",
+    "SUMARRAY",
+    "SUMCARRAY",
+    "TOFULL",
+    "TOHALF",
+    "TOINT",
+    "TOLOWER",
+    "TOSTR",
+    "TOUPPER",
+    "UNICODE",
+    "UNICODEBYTE",
+    "VARSETEX",
+    "VARSIZE",
+    "XML_ADDATTRIBUTE",
+    "XML_ADDATTRIBUTE_BYNAME",
+    "XML_ADDNODE",
+    "XML_ADDNODE_BYNAME",
+    "XML_DOCUMENT",
+    "XML_EXIST",
+    "XML_GET",
+    "XML_GET_BYNAME",
+    "XML_RELEASE",
+    "XML_REMOVEATTRIBUTE",
+    "XML_REMOVEATTRIBUTE_BYNAME",
+    "XML_REMOVENODE",
+    "XML_REMOVENODE_BYNAME",
+    "XML_REPLACE",
+    "XML_REPLACE_BYNAME",
+    "XML_SET",
+    "XML_SET_BYNAME",
+    "XML_TOSTR"
+  ],
+  "chara": {
+    "keys": {
+      "MARK": "MARK",
+      "刻印": "MARK",
+      "経験": "EXP",
+      "EXP": "EXP",
+      "能力": "ABL",
+      "ABL": "ABL",
+      "BASE": "MAXBASE",
+      "基礎": "MAXBASE",
+      "素質": "TALENT",
+      "TALENT": "TALENT",
+      "相性": "RELATION",
+      "RELATION": "RELATION",
+      "フラグ": "CFLAG",
+      "CFLAG": "CFLAG",
+      "装着物": "EQUIP",
+      "EQUIP": "EQUIP",
+      "JUEL": "JUEL",
+      "珠": "JUEL",
+      "CSTR": "CSTR"
+    },
+    "identity": [
+      "CALLNAME",
+      "MASTERNAME",
+      "NAME",
+      "NICKNAME",
+      "NO",
+      "あだ名",
+      "主人の呼び方",
+      "名前",
+      "呼び名",
+      "番号"
+    ],
+    "ignored": [
+      "ISASSI",
+      "助手"
+    ]
+  }
+}

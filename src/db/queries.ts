@@ -4346,6 +4346,30 @@ export class QueryBuilder {
       this.db.exec('DELETE FROM files');
     })();
   }
+
+  /**
+   * Unresolved references whose name starts with `prefix`, whatever their
+   * status — for synthesis passes whose references fan out to many targets.
+   * A range scan rather than LIKE, so it uses idx_unresolved_name.
+   */
+  getUnresolvedReferencesByNamePrefix(prefix: string): UnresolvedReference[] {
+    if (!prefix) return [];
+    const upper = prefix.slice(0, -1) + String.fromCharCode(prefix.charCodeAt(prefix.length - 1) + 1);
+    const rows = this.db.prepare(
+      'SELECT * FROM unresolved_refs WHERE reference_name >= ? AND reference_name < ? ORDER BY id'
+    ).all(prefix, upper) as UnresolvedRefRow[];
+    return rows.map((row) => ({
+      fromNodeId: row.from_node_id,
+      referenceName: row.reference_name,
+      referenceKind: row.reference_kind as EdgeKind,
+      line: row.line,
+      column: row.col,
+      candidates: row.candidates ? safeJsonParse(row.candidates, undefined) : undefined,
+      filePath: row.file_path,
+      language: row.language as Language,
+      rowId: row.id,
+    }));
+  }
 }
 
 /**

@@ -35,7 +35,7 @@ import { declaredDependencies } from '../resolution/frameworks/package-deps';
 import type { ResolutionContext } from '../resolution/types';
 import { createYielder, type MaybeYield } from '../resolution/cooperative-yield';
 import { resurrectRefFromDroppedEdge } from '../resolution/resurrect-ref';
-import { MAX_SOURCE_FILE_SIZE_BYTES, oversizeStamp, readBoundedSource, readBoundedSourceSync } from '../file-limits';
+import { sourceSizeLimit, oversizeStamp, readBoundedSource, readBoundedSourceSync } from '../file-limits';
 export { oversizeStamp };
 
 /**
@@ -181,8 +181,8 @@ export function hashContent(content: string): string {
  * and runs only for a file that is new or changed — never once per `.ts` file
  * at discovery, which on a slow disk is a random read per file per scan.
  */
-function readSourceOrStamp(fullPath: string): string | null {
-  const { stats, bytes } = readBoundedSourceSync(fullPath);
+function readSourceOrStamp(fullPath: string, filePath: string): string | null {
+  const { stats, bytes } = readBoundedSourceSync(fullPath, filePath);
   if (bytes === null) return oversizeStamp(stats.size);
   return isMpegTsBytes(fullPath, bytes) ? null : bytes.toString('utf8');
 }
@@ -1932,7 +1932,7 @@ export class ExtractionOrchestrator {
         try {
           // Framework detectors scan source by name; a file over the size
           // limit was never indexed and must not be decoded here either (#1910).
-          return readBoundedSourceSync(full).bytes?.toString('utf8') ?? null;
+          return readBoundedSourceSync(full, relativePath).bytes?.toString('utf8') ?? null;
         } catch {
           return null;
         }
@@ -2431,7 +2431,7 @@ export class ExtractionOrchestrator {
             // Stat first: a file over the size limit is stored as skipped
             // without ever being read or decoded (#1910), so ten oversize
             // fixtures in one I/O batch no longer cost their size in RSS.
-            const { stats, bytes } = await readBoundedSource(fullPath);
+            const { stats, bytes } = await readBoundedSource(fullPath, fp);
             if (bytes === null) {
               return { filePath: fp, content: oversizeStamp(stats.size), stats, error: null as Error | null };
             }
@@ -2474,18 +2474,18 @@ export class ExtractionOrchestrator {
           continue;
         }
 
-        // Honour MAX_SOURCE_FILE_SIZE_BYTES. Without this check, vendored generated
+        // Honour sourceSizeLimit(filePath). Without this check, vendored generated
         // headers, minified bundles, and other multi-MB files get indexed,
         // wasting WASM heap and the worker recycle budget on inputs with no
         // useful symbols. The single-file extractFile path already enforces
         // this; the bulk path used to silently skip the check.
-        if (stats.size > MAX_SOURCE_FILE_SIZE_BYTES) {
+        if (stats.size > sourceSizeLimit(filePath)) {
           await storeResult(filePath, content, stats, {
             nodes: [],
             edges: [],
             unresolvedReferences: [],
             errors: [{
-              message: `File exceeds max size (${stats.size} > ${MAX_SOURCE_FILE_SIZE_BYTES})`,
+              message: `File exceeds max size (${stats.size} > ${sourceSizeLimit(filePath)})`,
               filePath,
               severity: 'warning',
               code: 'size_exceeded',
@@ -2589,7 +2589,7 @@ export class ExtractionOrchestrator {
           const fullPath = validatePathWithinRoot(this.rootDir, filePath);
           if (!fullPath) continue;
           // Bounded like the first read: the file may have grown since (#1910).
-          const bytes = (await readBoundedSource(fullPath)).bytes;
+          const bytes = (await readBoundedSource(fullPath, filePath)).bytes;
           if (bytes === null) continue;
           content = bytes.toString('utf8');
         } catch {
@@ -2643,7 +2643,7 @@ export class ExtractionOrchestrator {
           try {
             const fullPath = validatePathWithinRoot(this.rootDir, filePath);
             if (!fullPath) continue;
-            const bytes = (await readBoundedSource(fullPath)).bytes;
+            const bytes = (await readBoundedSource(fullPath, filePath)).bytes;
             if (bytes === null) continue;
             fullContent = bytes.toString('utf8');
           } catch {
@@ -2778,7 +2778,7 @@ export class ExtractionOrchestrator {
     let stats: fs.Stats;
     try {
       // An oversize file is stored as skipped; its bytes are never needed (#1910).
-      const read = await readBoundedSource(fullPath);
+      const read = await readBoundedSource(fullPath, relativePath);
       stats = read.stats;
       // An MPEG transport stream named `.ts` is not TypeScript (#1910).
       if (read.bytes !== null && isMpegTsBytes(relativePath, read.bytes)) {
@@ -2830,14 +2830,14 @@ export class ExtractionOrchestrator {
     const language = detectLanguage(relativePath, content, loadExtensionOverrides(this.rootDir), this.rootDir);
 
     // Check file size
-    if (stats.size > MAX_SOURCE_FILE_SIZE_BYTES) {
+    if (stats.size > sourceSizeLimit(relativePath)) {
       const result: ExtractionResult = {
         nodes: [],
         edges: [],
         unresolvedReferences: [],
         errors: [
           {
-            message: `File exceeds max size (${stats.size} > ${MAX_SOURCE_FILE_SIZE_BYTES})`,
+            message: `File exceeds max size (${stats.size} > ${sourceSizeLimit(relativePath)})`,
             filePath: relativePath,
             severity: 'warning',
             code: 'size_exceeded',
@@ -3432,7 +3432,7 @@ export class ExtractionOrchestrator {
       // (An oversize file hashes as its size stamp, unread — #1910.)
       let content: string | null;
       try {
-        content = readSourceOrStamp(fullPath);
+        content = readSourceOrStamp(fullPath, filePath);
       } catch (error) {
         logDebug('Skipping unreadable file during sync', { filePath, error: String(error) });
         failedFilePaths.push(filePath);
@@ -3603,7 +3603,7 @@ export class ExtractionOrchestrator {
           continue;
         }
         let content: string | null;
-        try { content = readSourceOrStamp(fullPath); }
+        try { content = readSourceOrStamp(fullPath, filePath); }
         catch (error) {
           logDebug('Skipping unreadable file while detecting changes', { filePath, error: String(error) });
           continue;
@@ -3647,7 +3647,7 @@ export class ExtractionOrchestrator {
       const fullPath = path.join(this.rootDir, filePath);
       let content: string | null;
       try {
-        content = readSourceOrStamp(fullPath);
+        content = readSourceOrStamp(fullPath, filePath);
       } catch (error) {
         logDebug('Skipping unreadable file while detecting changes', { filePath, error: String(error) });
         continue;

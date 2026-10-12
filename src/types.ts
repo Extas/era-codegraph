@@ -68,6 +68,8 @@ export const EDGE_KINDS = [
   'overrides',       // Method overrides parent method
   'decorates',       // Decorator applied to symbol
   'navigates',       // Navigates to a screen/route (Expo Router `router.push('/x')`)
+  'reads',           // Era fork: function reads a variable or named slot
+  'writes',          // Era fork: function writes a variable or named slot
 ] as const;
 
 export type EdgeKind = (typeof EDGE_KINDS)[number];
@@ -119,6 +121,8 @@ export const LANGUAGES = [
   'erlang',
   'terraform',
   'unknown',
+  'erabasic',
+  'eracsv',
 ] as const;
 
 export type Language = (typeof LANGUAGES)[number];

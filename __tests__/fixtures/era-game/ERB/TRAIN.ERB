@@ -1,0 +1,13 @@
+﻿;=================================================
+;执行玩家选择的指令
+;=================================================
+@EXEC_COM, ARG
+IF RAND:2 == 0
+	TFLAG:899 = 1
+ENDIF
+RESULT = 0
+TRYCALLFORM COM_ABLE{ARG}(TARGET)
+SIF RESULT == 0
+	RETURN 0
+ABL:10 = 1
+RETURN 1

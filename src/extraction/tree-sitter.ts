@@ -30,6 +30,7 @@ import { LiquidExtractor } from './liquid-extractor';
 import { RazorExtractor } from './razor-extractor';
 import { SvelteExtractor } from './svelte-extractor';
 import { AstroExtractor } from './astro-extractor';
+import { extractEraBasic, extractEraCsv } from '../era';
 import { DfmExtractor } from './dfm-extractor';
 import { VueExtractor } from './vue-extractor';
 import { MyBatisExtractor } from './mybatis-extractor';
@@ -8276,8 +8277,12 @@ export function extractFromSource(
 
   let result: ExtractionResult;
 
-  // Use custom extractor for Svelte
-  if (detectedLanguage === 'svelte') {
+  // Use custom extractors for grammarless formats.
+  if (detectedLanguage === 'erabasic') {
+    result = extractEraBasic(filePath, source);
+  } else if (detectedLanguage === 'eracsv') {
+    result = extractEraCsv(filePath, source);
+  } else if (detectedLanguage === 'svelte') {
     const extractor = new SvelteExtractor(filePath, source);
     result = extractor.extract();
   } else if (detectedLanguage === 'vue') {

@@ -460,7 +460,7 @@ const ISOLATED_WEAK_KIND_WEIGHT = 0.08;
  */
 const RELEVANCE_USAGE_EDGES: ReadonlySet<string> = new Set([
   'calls', 'references', 'extends', 'implements', 'overrides',
-  'instantiates', 'returns', 'type_of', 'decorates', 'navigates',
+  'instantiates', 'returns', 'type_of', 'decorates', 'navigates', 'reads', 'writes',
 ]);
 
 /**
@@ -2630,7 +2630,7 @@ export class ToolHandler {
         if (st.size !== rec.size || Math.floor(st.mtimeMs) !== Math.floor(rec.modifiedAt)) {
           // A file over the index's size limit is stored as its size stamp
           // (#1910), so it is compared as one, without reading it.
-          const data = indexedHashInput(st.size, () => content ?? readFileSync(absPath, 'utf-8'));
+          const data = indexedHashInput(st.size, () => content ?? readFileSync(absPath, 'utf-8'), relPath);
           // Must stay byte-identical to extraction's `hashContent` (sha256 over
           // the utf-8 string) — the identical-rewrite test in
           // mcp-stale-slice.test.ts pins the parity. Inlined (not imported)
@@ -3942,7 +3942,7 @@ export class ToolHandler {
 
     const RANK_EDGES = new Set<string>([
       'calls', 'references', 'extends', 'implements', 'overrides',
-      'instantiates', 'returns', 'type_of', 'imports', 'navigates',
+      'instantiates', 'returns', 'type_of', 'imports', 'navigates', 'reads', 'writes',
     ]);
     const adj: number[][] = Array.from({ length: n }, () => []);
     for (const e of edges) {

@@ -118,8 +118,8 @@ function candidatePaths(): string[] {
 }
 
 /**
- * Verify the binary speaks our wire contract: same ABI version and byte-equal
- * NodeKind/EdgeKind tables (kinds cross the boundary as indexes into these).
+ * Verify the binary speaks our wire contract: same ABI and NodeKind table,
+ * with its EdgeKind table a prefix (kinds cross the boundary as indexes).
  */
 function verifyContract(mod: KernelModule, from: string): boolean {
   const info = mod.contractInfo();
@@ -129,7 +129,10 @@ function verifyContract(mod: KernelModule, from: string): boolean {
   }
   const sameTable = (a: readonly string[], b: readonly string[]) =>
     a.length === b.length && a.every((v, i) => v === b[i]);
-  if (!sameTable(info.nodeKinds, NODE_KINDS) || !sameTable(info.edgeKinds, EDGE_KINDS)) {
+  // Fork edge kinds extend the kernel table without changing its wire indexes.
+  if (!sameTable(info.nodeKinds, NODE_KINDS) ||
+      info.edgeKinds.length > EDGE_KINDS.length ||
+      !info.edgeKinds.every((kind, i) => kind === EDGE_KINDS[i])) {
     debug(`${from}: NodeKind/EdgeKind tables differ from src/types.ts — ignoring kernel`);
     return false;
   }
