@@ -1,6 +1,15 @@
 name: Deploy site to GitHub Pages
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/deploy-site.yml'
+  pull_request:
+    paths:
+      - 'site/**'
+      - '.github/workflows/deploy-site.yml'
   workflow_dispatch:
 
 # Allow GITHUB_TOKEN to deploy to Pages and verify the deployment origin.
@@ -27,6 +36,7 @@ jobs:
           node-version: 22
 
   deploy:
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     environment:
