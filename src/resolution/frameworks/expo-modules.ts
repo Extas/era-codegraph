@@ -48,6 +48,7 @@ import {
 } from '../types';
 import { resolveImportPath } from '../import-resolver';
 import { stripCommentsForRegex } from '../strip-comments';
+import { escapeRegExp } from '../../utils';
 
 /**
  * Match `Function("name")`, `AsyncFunction("name")`, or `Property("name")`
@@ -218,7 +219,8 @@ interface NativeBinding {
   file: string;
 }
 
-const bindingMemo = new WeakMap<ResolutionContext, Map<string, NativeBinding | null>>();
+/** Per context, renewed with the route list (whose identity changes when the resolver's caches do). */
+const bindingMemo = new WeakMap<ResolutionContext, { source: readonly Node[]; memo: Map<string, NativeBinding | null> }>();
 
 /**
  * What `name` is bound to in `file`: `const X = requireNativeModule('N')`
@@ -227,14 +229,16 @@ const bindingMemo = new WeakMap<ResolutionContext, Map<string, NativeBinding | n
  * whose whole body is `export default requireNativeModule<CameraNativeModule>('ExpoCamera')`.
  */
 function nativeBinding(name: string, file: string, context: ResolutionContext): NativeBinding | null {
-  let memo = bindingMemo.get(context);
-  if (!memo) bindingMemo.set(context, (memo = new Map()));
+  const source = context.getNodesByKind('route');
+  let entry = bindingMemo.get(context);
+  if (!entry || entry.source !== source) bindingMemo.set(context, (entry = { source, memo: new Map() }));
+  const memo = entry.memo;
   const key = `${file}\0${name}`;
   if (memo.has(key)) return memo.get(key)!;
   let found: NativeBinding | null = null;
   const own = context.readFile(file);
   if (own && own.includes('NativeModule')) {
-    const local = new RegExp(String.raw`\b(?:const|let|var)\s+${name}\s*(?::[^=]+)?=\s*` + REQUIRE_NATIVE.source).exec(stripCommentsForRegex(own, 'typescript'));
+    const local = new RegExp(String.raw`\b(?:const|let|var)\s+${escapeRegExp(name)}\s*(?::[^=]+)?=\s*` + REQUIRE_NATIVE.source).exec(stripCommentsForRegex(own, 'typescript'));
     if (local) found = { type: local[1] ?? null, module: local[2]!, file };
   }
   if (!found) {
@@ -246,7 +250,7 @@ function nativeBinding(name: string, file: string, context: ResolutionContext): 
       const safe = stripCommentsForRegex(content, 'typescript');
       const pattern = binding!.isDefault
         ? new RegExp(String.raw`\bexport\s+default\s+` + REQUIRE_NATIVE.source)
-        : new RegExp(String.raw`\bexport\s+(?:const|let)\s+${binding!.exportedName}\s*(?::[^=]+)?=\s*` + REQUIRE_NATIVE.source);
+        : new RegExp(String.raw`\bexport\s+(?:const|let)\s+${escapeRegExp(binding!.exportedName)}\s*(?::[^=]+)?=\s*` + REQUIRE_NATIVE.source);
       const m = pattern.exec(safe);
       if (m) found = { type: m[1] ?? null, module: m[2]!, file: target };
     }

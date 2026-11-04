@@ -36,6 +36,25 @@ export function indexedHashInput(size: number, content: () => string, filePath =
   return size > sourceSizeLimit(filePath) ? oversizeStamp(size) : content();
 }
 
+/**
+ * A source file's text, or null for what extraction wouldn't take: anything but
+ * a regular file, or a file over the limit, which decoding could multiply into
+ * gigabytes of heap. Checked on the open file: looking the path up twice is a
+ * quarter of the read. O_NONBLOCK keeps a FIFO with no writer from parking the
+ * open itself. Throws what a failed open or read throws.
+ * A project-relative filePath retains the same Era limit used during extraction.
+ */
+export function readSourceText(file: string, filePath = ''): string | null {
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NONBLOCK ?? 0));
+  try {
+    const stats = fs.fstatSync(fd);
+    if (!stats.isFile() || stats.size > sourceSizeLimit(filePath)) return null;
+    return fs.readFileSync(fd, 'utf-8');
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 /** A source file's stats, and its bytes when they are within the limit (null = oversize). */
 export interface BoundedSource {
   stats: fs.Stats;

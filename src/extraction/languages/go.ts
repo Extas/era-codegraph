@@ -55,13 +55,15 @@ const GO_PREDECLARED_TYPES: ReadonlySet<string> = new Set([
  * embed `Base`. A qualified type yields its name, not its package: the package
  * stays in the source text, and resolution reads it back from the reference's
  * position (#2322). Undefined for any other type (a literal, `~T`, a union's
- * term) and for a predeclared one.
+ * term) and for a predeclared one but `error`: an interface with a method,
+ * which an embedding brings in like any type's from outside the index.
  */
 export function goEmbeddedTypeName(type: SyntaxNode | null | undefined, source: string): SyntaxNode | undefined {
   if (type?.type === 'generic_type') type = getChildByField(type, 'type');
   if (type?.type === 'qualified_type') return getChildByField(type, 'name') ?? undefined;
   if (type?.type !== 'type_identifier') return undefined;
-  return GO_PREDECLARED_TYPES.has(getNodeText(type, source)) ? undefined : type;
+  const name = getNodeText(type, source);
+  return name === 'error' || !GO_PREDECLARED_TYPES.has(name) ? type : undefined;
 }
 
 /**
@@ -214,8 +216,10 @@ export const goExtractor: LanguageExtractor = {
   },
   isExported: (node, source) => {
     // Go: a symbol is exported when its identifier starts with an uppercase letter.
-    // Look at the `name` field directly (works for function_declaration,
-    // method_declaration, type_spec, and var_spec / const_spec via extractor flow).
+    // Look at the `name` field directly: function_declaration,
+    // method_declaration, type_spec, and a var_spec / const_spec, whose first
+    // name is the one the extractor gives a node (never the declaration
+    // around a spec, which has no name).
     const nameNode = getChildByField(node, 'name');
     if (nameNode) {
       const text = getNodeText(nameNode, source);
