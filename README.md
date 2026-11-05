@@ -944,3 +944,11 @@ MIT
 [Report Bug](https://github.com/colbymchenry/codegraph/issues) · [Request Feature](https://github.com/colbymchenry/codegraph/issues)
 
 </div>
+
+
+## 源码维护与同步
+
+本 fork 沿 Git 维护，`upstream/main` 为 `colbymchenry/codegraph`，授权发布目标是 `origin/main`（`Extas/era-codegraph`）。整合上游时保留 Era 的 reads/writes、动态派发与大脚本读取边界，沿上游当前接口迁移扩展调用者；用真实 Era 源码查询核对受影响行为。索引数据库可重建，不纳入源码发布。
+
+提交、上游整合与授权推送遵守[共用远端同步规范](https://github.com/Extas/agent-skills/blob/main/skills/agents-engineering/references/version-control.md#远端同步)；本文只维护本项目的角色与例外。
+
