@@ -36,7 +36,8 @@ import type { ResolutionContext } from '../resolution/types';
 import { createYielder, type MaybeYield } from '../resolution/cooperative-yield';
 import { resurrectRefFromDroppedEdge } from '../resolution/resurrect-ref';
 import { createImportReader, reopenReferencesThroughRemovedFiles } from '../resolution/module-importers';
-import { sourceSizeLimit, oversizeStamp, readBoundedSource, readBoundedSourceSync } from '../file-limits';
+import { sourceSizeLimit, oversizeStamp, readBoundedSource, readBoundedSourceSync, decodeSourceBytes } from '../file-limits';
+import { getEraProfile, isEraSourceFile, isEraScriptFile, isEraCharaCsv } from '../era';
 export { oversizeStamp };
 
 /**
@@ -209,7 +210,7 @@ export function hashContent(content: string): string {
 function readSourceOrStamp(fullPath: string, filePath: string): string | null {
   const { stats, bytes } = readBoundedSourceSync(fullPath, filePath);
   if (bytes === null) return oversizeStamp(stats.size);
-  return isMpegTsBytes(fullPath, bytes) ? null : bytes.toString('utf8');
+  return isMpegTsBytes(fullPath, bytes) ? null : decodeSourceBytes(bytes, filePath);
 }
 
 /**
@@ -2136,6 +2137,7 @@ function pairReindexedNodes(
 export class ExtractionOrchestrator {
   private rootDir: string;
   private queries: QueryBuilder;
+  private readonly eraDependencyReparse = new Set<string>();
   /**
    * Names of frameworks detected for this project, populated by indexAll().
    * Passed to extractFromSource so framework-specific extractors (route nodes,
@@ -2830,7 +2832,7 @@ export class ExtractionOrchestrator {
             if (isMpegTsBytes(fp, bytes)) {
               return { filePath: fp, content: null as string | null, stats: null as fs.Stats | null, error: null as Error | null, skipped: true };
             }
-            const content = bytes.toString('utf-8');
+            const content = decodeSourceBytes(bytes, fp);
             return { filePath: fp, content, stats, error: null as Error | null };
           } catch (err) {
             // Nothing at the path is not a file that could not be read (#2904):
@@ -3102,6 +3104,7 @@ export class ExtractionOrchestrator {
     // Shut down the parse worker pool.
     if (pool) await pool.destroy();
 
+    if (!errors.some(e => e.severity === 'error')) this.queries.setMetadata('era_profile', JSON.stringify(getEraProfile().profile));
     return {
       success: filesIndexed > 0 || errors.filter((e) => e.severity === 'error').length === 0,
       filesIndexed,
@@ -3193,7 +3196,7 @@ export class ExtractionOrchestrator {
       if (read.bytes !== null && isMpegTsBytes(relativePath, read.bytes)) {
         return { nodes: [], edges: [], unresolvedReferences: [], errors: [], durationMs: 0 };
       }
-      content = read.bytes === null ? oversizeStamp(stats.size) : read.bytes.toString('utf8');
+      content = read.bytes === null ? oversizeStamp(stats.size) : decodeSourceBytes(read.bytes, relativePath);
     } catch (error) {
       // Nothing at the path: nothing to index, and not a read failure (#2904).
       if (isMissingPathError(error)) {
@@ -3352,7 +3355,8 @@ export class ExtractionOrchestrator {
     // successful retry's symbols — a permanent empty file presented as
     // recovered (the #1541 wipe, reintroduced through the marker path).
     const existingFile = this.queries.getFileByPath(filePath);
-    if (existingFile && existingFile.contentHash === contentHash) {
+    const dependencyChanged = this.eraDependencyReparse.delete(filePath);
+    if (existingFile && existingFile.contentHash === contentHash && !dependencyChanged) {
       const existingIsMarker =
         existingFile.nodeCount === 0 && (existingFile.errors?.length ?? 0) > 0;
       const incomingHasContent = result.nodes.length > 0;
@@ -3805,6 +3809,12 @@ export class ExtractionOrchestrator {
     onFileChange?: (filePath: string, content?: string) => void
   ): Promise<SyncResult> {
     await initGrammars(); // Initialize WASM runtime (grammars loaded lazily below)
+    const eraProfile = JSON.stringify(getEraProfile().profile);
+    const profileChanged = this.queries.getMetadata('era_profile') !== eraProfile &&
+      this.queries.getAllFilePaths().some(p => isEraScriptFile(p) || /^csv\//i.test(p.replace(/\\/g, '/')));
+    // A profile can change which CSVs are source at all. Reconcile removals as
+    // well as reparsing; a watcher's narrow filesystem list cannot express that.
+    if (profileChanged) scopedPaths = undefined;
     const startTime = Date.now();
     let filesChecked = 0;
     let filesAdded = 0;
@@ -4026,6 +4036,25 @@ export class ExtractionOrchestrator {
       }
     }
 
+    // CSV names and engine vocabulary are inputs to every Era parse/resolution.
+    // Revisit dependent files even when their own bytes did not change, including
+    // scoped watcher syncs. Keep the old graph until store can resurrect its edges.
+    const csvChanged = [...changedFilePaths, ...removedFilePaths].some(p => /^csv\//i.test(p.replace(/\\/g, '/')));
+    if (profileChanged || csvChanged) {
+      const allFiles = await scanDirectoryAsync(this.rootDir);
+      const queued = new Set(filesToIndex);
+      for (const filePath of allFiles) {
+        if (!(profileChanged ? isEraSourceFile(filePath) : isEraScriptFile(filePath) || isEraCharaCsv(filePath))) continue;
+        this.eraDependencyReparse.add(filePath);
+        if (queued.has(filePath)) continue;
+        queued.add(filePath);
+        filesToIndex.push(filePath);
+        changedFilePaths.push(filePath);
+        filesModified++;
+        onFileChange?.(filePath);
+      }
+    }
+
     // Sampled here — after the add/modify classification, before any file is
     // re-extracted — because `storeExtractionResult` deletes a file's nodes
     // before inserting the new ones, so this is the last point the pre-edit
@@ -4070,6 +4099,8 @@ export class ExtractionOrchestrator {
       const pause = backpressure?.();
       if (pause) await pause;
     }
+    if (failedFilePaths.length === 0) this.queries.setMetadata('era_profile', eraProfile);
+    this.eraDependencyReparse.clear();
 
     for (const filePath of indexedFromSkip) {
       if ((this.queries.getFileByPath(filePath)?.nodeCount ?? 0) > 0) addedFilePaths.push(filePath);

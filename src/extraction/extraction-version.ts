@@ -21,4 +21,4 @@
  * turns the re-index hint into noise — keep it honest (see CLAUDE.md, "Honesty
  * in the product is load-bearing").
  */
-export const EXTRACTION_VERSION = 29; // Era fork: upstream + 1
+export const EXTRACTION_VERSION = 30; // Era fork: source decoding and engine slot semantics

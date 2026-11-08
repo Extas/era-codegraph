@@ -39,7 +39,7 @@ import * as path from 'path';
 import type { FileRecord } from '../../types';
 import type { CodeGraph } from '../../index';
 import { resolveProjectFile } from '../security';
-import { indexedHashInput } from '../../file-limits';
+import { indexedHashInput, decodeSourceBytes } from '../../file-limits';
 import { highlightLines, type HighlightResult } from '../highlight';
 import { ApiError, badRequest, intParam, notFound, textParam } from './respond';
 
@@ -181,7 +181,7 @@ export function readIndexedFileText(
     const absolute = resolveProjectFile(projectRoot, found.storedPath);
     const stats = fs.statSync(absolute);
     if (!stats.isFile() || stats.size > maxBytes) return null;
-    return fs.readFileSync(absolute, 'utf8');
+    return decodeSourceBytes(fs.readFileSync(absolute), found.storedPath);
   } catch {
     return null;
   }
@@ -214,7 +214,7 @@ export function hasDriftedOnDisk(
     }
     // A file over the index's size limit is stored as its size stamp (#1910),
     // so it is compared as one — without reading it.
-    const hashed = indexedHashInput(stats.size, () => fs.readFileSync(absolute, 'utf-8'));
+    const hashed = indexedHashInput(stats.size, () => decodeSourceBytes(fs.readFileSync(absolute), storedPath), storedPath);
     return createHash('sha256').update(hashed).digest('hex') !== record.contentHash;
   } catch {
     return false;
@@ -253,8 +253,8 @@ export function readFileShape(
     if (stats.size > MAX_SOURCE_BYTES) {
       return { drift: false, totalLines: null, reason: 'The file is too large to read here.' };
     }
-    const content = fs.readFileSync(absolute, 'utf-8');
-    const hashed = indexedHashInput(stats.size, () => content);
+    const content = decodeSourceBytes(fs.readFileSync(absolute), storedPath);
+    const hashed = indexedHashInput(stats.size, () => content, storedPath);
     const drift = createHash('sha256').update(hashed).digest('hex') !== record.contentHash;
     return {
       drift,
@@ -388,7 +388,7 @@ export async function buildSource(
 
   let content: string;
   try {
-    content = fs.readFileSync(absolute, 'utf-8');
+    content = decodeSourceBytes(fs.readFileSync(absolute), base.file);
   } catch (err) {
     throw new ApiError(
       'internal',
@@ -400,7 +400,7 @@ export async function buildSource(
   // string). A touch or a checkout that rewrote the same bytes must not count
   // as drift, which is exactly what hashing content rather than mtime buys.
   // A file over the index's size limit is stored as its size stamp (#1910).
-  const hash = createHash('sha256').update(indexedHashInput(stats.size, () => content)).digest('hex');
+  const hash = createHash('sha256').update(indexedHashInput(stats.size, () => content, base.file)).digest('hex');
   const drift = hash !== record.contentHash;
   if (drift && onDrift === 'omit') {
     return {

@@ -34,10 +34,13 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
   const errors: ExtractionError[] = [];
   const lines = prepareLines(source);
   const rows: CsvRow[] = [];
-  for (const line of lines) {
-    if (line.blank) continue;
-    const fields = line.code.split(',');
-    if (fields.length >= 2) rows.push({ line, fields });
+  // EraStreamReader skips leading whitespace/comment-only lines. loadDataTo
+  // splits the remaining raw line, without trimming fields or inline comments.
+  for (const [offset, raw] of source.replace(/^\uFEFF/, '').split(/\r?\n/).entries()) {
+    const code = raw.trimStart();
+    if (!code || code.startsWith(';')) continue;
+    const fields = code.split(',');
+    if (fields.length >= 2) rows.push({ line: { code, line: offset + 1, comment: '', blank: false }, fields });
   }
   const charaSheet = isEraCharaCsv(filePath);
   const engineAnchor = isEraEngineAnchor(filePath);
@@ -95,12 +98,10 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
       if (!Number.isInteger(index) || index < 0) continue;
       if (!/^\s*[-+]?\d+\s*$/.test(fields[0]!)) continue;
 
-      // The engine keeps the name verbatim, so an ERB lookup matches the raw
-      // string. Display and search want it tidy, so the node carries the
-      // trimmed form as `name` and the raw form stays recoverable from the file.
+      // Keep exact spelling, including empty/whitespace names: an empty later
+      // row clears a previous name in ConstantData.loadDataTo.
       const rawName = fields[1]!;
       const displayName = rawName.trim();
-      if (!displayName) continue;
 
       // A duplicate index is a real defect the engine warns about and the last
       // row wins. Record it so the graph does not silently show two truths.
@@ -122,7 +123,8 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
       nodes.push({
         id: nodeId,
         kind: 'constant',
-        name: displayName,
+        name: rawName || `${varName}:${index}`,
+        decorators: rawName ? undefined : ['era:empty-slot-name'],
         qualifiedName,
         filePath: filePath,
         language: 'eracsv',
@@ -214,7 +216,7 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
       // The index token may be a number or a CSV name; the resolver settles
       // both against the same slot dictionaries the scripts use. A missing
       // index (`素質,,1`) is an engine warning, not a write.
-      const indexToken = fields[1]!.trim();
+      const indexToken = fields[1]!;
       if (!indexToken) continue;
 
       const chain = `${variable}:${indexToken}`;

@@ -1,8 +1,9 @@
 import { createHash } from 'crypto';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
-import { sourceSizeLimit, oversizeStamp } from '../file-limits';
+import { sourceSizeLimit, oversizeStamp, decodeSourceBytes } from '../file-limits';
 import { validatePathWithinRoot } from '../utils';
+import { isEraSourceFile } from '../era';
 
 export interface AnswerFile {
   path: string;
@@ -40,22 +41,29 @@ export async function validateAnswerFiles(root: string, files: AnswerFile[]): Pr
       // A file over the index's size limit is stored as its size stamp
       // (#1910): when the stamp still matches, the file is current without
       // being read. Anything else falls through to the bounded read below.
-      const { size } = await stat(absolute);
-      if (size > sourceSizeLimit(file.path) &&
-          createHash('sha256').update(oversizeStamp(size)).digest('hex') === file.contentHash) {
+      const stats = await stat(absolute);
+      if (!stats.isFile()) { stale.push(file.path); continue; }
+      if (stats.size > sourceSizeLimit(file.path)) {
+        if (createHash('sha256').update(oversizeStamp(stats.size)).digest('hex') !== file.contentHash) {
+          (stats.size > MAX_BYTES - bytes ? unchecked : stale).push(file.path);
+        }
         continue;
       }
-      const stream = createReadStream(absolute, {
-        encoding: 'utf8', highWaterMark: 64 * 1024, signal,
-      });
+      const era = isEraSourceFile(file.path);
+      const stream = createReadStream(absolute, { highWaterMark: 64 * 1024, signal, encoding: era ? undefined : 'utf8' });
+      const chunks: Buffer[] = [];
       let complete = true;
       for await (const chunk of stream) {
         bytes += Buffer.byteLength(chunk);
         if (bytes > MAX_BYTES) { complete = false; break; }
-        hash.update(chunk);
+        if (era) chunks.push(chunk);
+        else hash.update(chunk);
       }
       if (!complete) unchecked.push(file.path);
-      else if (hash.digest('hex') !== file.contentHash) stale.push(file.path);
+      else {
+        if (era) hash.update(decodeSourceBytes(Buffer.concat(chunks), file.path));
+        if (hash.digest('hex') !== file.contentHash) stale.push(file.path);
+      }
     } catch {
       // Timeout is unknown, never a clean bill of health. A missing or
       // unreadable contributing file cannot support the indexed answer.

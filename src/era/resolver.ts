@@ -35,17 +35,6 @@ const CHARACTER_SELECTORS: Record<string, true> = {
   ASSIPLAY: true, NO: true, CHARANUM: true,
 };
 
-let profileCache: EraProfileIndex | null = null;
-
-function profile(): EraProfileIndex | null {
-  if (profileCache) return profileCache;
-  try {
-    profileCache = getEraProfile();
-  } catch {
-    profileCache = null;
-  }
-  return profileCache;
-}
 
 /**
  * Slot dictionaries, built once per resolution run.
@@ -58,33 +47,43 @@ function profile(): EraProfileIndex | null {
 interface SlotIndex {
   /** primary variable -> (row name -> slot index) */
   byVariable: Map<string, Map<string, number>>;
+  bySlot: Map<string, Node>;
+  profile: EraProfileIndex;
 }
 
-let slotIndex: SlotIndex | null = null;
-let slotIndexGeneration = '';
+const slotIndexes = new WeakMap<ResolutionContext, { source: Node[]; index: SlotIndex }>();
 
-function buildSlotIndex(context: ResolutionContext): SlotIndex {
+function slotsFor(context: ResolutionContext): SlotIndex {
+  // ReferenceResolver replaces its kind arrays when it clears a resolution pass.
+  const source = context.getNodesByKind('constant');
+  const cached = slotIndexes.get(context);
+  if (cached?.source === source) return cached.index;
+  const index = buildSlotIndex(source);
+  slotIndexes.set(context, { source, index });
+  return index;
+}
+
+function buildSlotIndex(constants: Node[]): SlotIndex {
   const byVariable = new Map<string, Map<string, number>>();
-  const constants = context.iterateNodesByKind
-    ? context.iterateNodesByKind('constant')
-    : context.getNodesByKind('constant');
+  const bySlot = new Map<string, Node>();
+  // ConstantData.loadDataTo overwrites numeric rows; preserve all graph nodes,
+  // but resolve the final line. Its reverse dictionary then visits slots in
+  // ascending numeric order, so a duplicate name means the lowest final slot.
   for (const node of constants) {
     if (node.language !== 'eracsv') continue;
     const parsed = parseSlotQualifiedName(node.qualifiedName);
     if (!parsed) continue;
-    let names = byVariable.get(parsed.variable);
-    if (!names) {
-      names = new Map();
-      byVariable.set(parsed.variable, names);
-    }
-    // The engine keeps CSV names verbatim but scripts are written by hand, so
-    // accept both the raw and the trimmed spelling. First definition wins,
-    // matching Emuera's warn-and-keep behaviour for duplicate rows.
-    if (!names.has(node.name)) names.set(node.name, parsed.index);
-    const trimmed = node.name.trim();
-    if (trimmed !== node.name && !names.has(trimmed)) names.set(trimmed, parsed.index);
+    const previous = bySlot.get(node.qualifiedName);
+    if (!previous || previous.startLine < node.startLine) bySlot.set(node.qualifiedName, node);
   }
-  return { byVariable };
+  for (const node of bySlot.values()) {
+    const parsed = parseSlotQualifiedName(node.qualifiedName)!;
+    let names = byVariable.get(parsed.variable);
+    if (!names) byVariable.set(parsed.variable, (names = new Map()));
+    if (!node.decorators?.includes('era:empty-slot-name') && node.name &&
+        (!names.has(node.name) || names.get(node.name)! > parsed.index)) names.set(node.name, parsed.index);
+  }
+  return { byVariable, bySlot, profile: getEraProfile() };
 }
 
 function parseSlotQualifiedName(qualifiedName: string): { variable: string; index: number } | null {
@@ -132,7 +131,7 @@ export const eraResolver: FrameworkResolver = {
    * mounted.
    */
   detect(context: ResolutionContext): boolean {
-    if (!profile()) return false;
+    getEraProfile();
     let sawScript = false;
     for (const file of context.getAllFiles()) {
       const lower = file.toLowerCase();
@@ -154,8 +153,7 @@ export const eraResolver: FrameworkResolver = {
   },
 
   resolve(ref: UnresolvedRef, context: ResolutionContext): ResolvedRef | null {
-    const index = profile();
-    if (!index) return null;
+    const index = slotsFor(context).profile;
 
     if (ref.referenceName.startsWith('ERA::FN::')) {
       const target = firstNode(context.getNodesByQualifiedName(ref.referenceName));
@@ -189,12 +187,8 @@ function resolveVariable(
   const primary = primaryVariableFor(variable, index);
 
   if (indices.length && builtin.backingCsv && !builtin.backingCsv.includes('*')) {
-    const generation = context.getProjectRoot();
-    if (!slotIndex || slotIndexGeneration !== generation) {
-      slotIndex = buildSlotIndex(context);
-      slotIndexGeneration = generation;
-    }
-    const names = slotIndex.byVariable.get(primary);
+    const slots = slotsFor(context);
+    const names = slots.byVariable.get(primary);
 
     for (const token of indices) {
       // `ABL:MASTER:顺从` selects a character first; only the remaining token
@@ -204,7 +198,7 @@ function resolveVariable(
 
       const numeric = /^\d+$/.test(token) ? Number.parseInt(token, 10) : names?.get(token);
       if (numeric === undefined) continue;
-      const slot = firstNode(context.getNodesByQualifiedName(qualifySlot(primary, numeric)));
+      const slot = slots.bySlot.get(qualifySlot(primary, numeric));
       if (slot) return resolved(ref, slot, /^\d+$/.test(token) ? 0.85 : 0.95);
     }
   }
@@ -216,10 +210,4 @@ function resolveVariable(
   return target ? resolved(ref, target, 0.7) : null;
 }
 
-/** Test seam: drop the memoised slot dictionaries. */
-export function resetEraResolverCaches(): void {
-  slotIndex = null;
-  slotIndexGeneration = '';
-  profileCache = null;
-}
 

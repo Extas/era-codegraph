@@ -13,6 +13,10 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { CodeGraph } from '../src';
 import type { Edge, Node } from '../src/types';
+import { ToolHandler } from '../src/mcp/tools';
+import { validateAnswerFiles } from '../src/mcp/answer-freshness';
+import { extractEraCsv, getEraProfile } from '../src/era';
+import { decodeSourceBytes, readSourceText } from '../src/file-limits';
 
 const FIXTURE = path.join(__dirname, 'fixtures', 'era-game');
 const BIG = 'ERB/KOJO_BIG.ERB';
@@ -114,4 +118,129 @@ describe('Era (Emuera) contract', () => {
     expect(fs.statSync(path.join(dir, BIG)).size).toBeGreaterThan(1024 * 1024);
     expect(fn('KOJO_BIG').filePath).toBe(BIG);
   });
+});
+
+describe('Era source facts across indexing lifetimes', () => {
+  const roots: string[] = [];
+  const graphs: CodeGraph[] = [];
+  afterAll(() => {
+    for (const graph of graphs) graph.close();
+    for (const root of roots) fs.rmSync(root, { recursive: true, force: true, maxRetries: 3 });
+  });
+  function game(csv: string | Buffer, erb: string | Buffer): string {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'era-facts-'));
+    roots.push(root);
+    fs.mkdirSync(path.join(root, 'CSV'));
+    fs.mkdirSync(path.join(root, 'ERB'));
+    fs.writeFileSync(path.join(root, 'CSV/GameBase.csv'), 'タイトル,fixture\n');
+    fs.writeFileSync(path.join(root, 'CSV/Abl.csv'), csv);
+    fs.writeFileSync(path.join(root, 'ERB/main.erb'), erb);
+    return root;
+  }
+  async function index(root: string): Promise<CodeGraph> {
+    const graph = await CodeGraph.init(root);
+    graphs.push(graph);
+    await graph.indexAll();
+    return graph;
+  }
+  function bindings(graph: CodeGraph): Array<[string | undefined, string | undefined, number | undefined]> {
+    const fn = graph.getNodesByName('PROBE').find(n => n.kind === 'function')!;
+    return graph.getOutgoingEdges(fn.id).filter(e => e.kind === 'reads').map(e => {
+      const target = graph.getNode(e.target);
+      return [String(e.metadata?.refName), target?.qualifiedName, target?.startLine] as [string, string | undefined, number | undefined];
+    }).sort((a, b) => String(a[0]).localeCompare(String(b[0])));
+  }
+
+  it('rebinds unchanged and edited ERB after CSV changes, isolated from another project and equal to fresh', async () => {
+    const a = game('10,OLD\n', '@PROBE\nSIF ABL:OLD > 0\nRETURN 1\n');
+    const b = game('20,OTHER\n', '@PROBE\nSIF ABL:OTHER > 0\nRETURN 1\n');
+    const ga = await index(a);
+    const gb = await index(b);
+    const other = bindings(gb);
+    fs.writeFileSync(path.join(a, 'CSV/Abl.csv'), '11,OLD\n12,NEW\n');
+    await ga.sync();
+    expect(bindings(ga)[0]?.[1]).toBe('ERA::SLOT::ABL:11');
+    fs.writeFileSync(path.join(a, 'CSV/Abl.csv'), '13,NEW\n');
+    fs.writeFileSync(path.join(a, 'ERB/main.erb'), '@PROBE\nSIF ABL:NEW > 0\nRETURN 2\n');
+    await gb.sync();
+    await ga.sync();
+    expect(bindings(gb)).toEqual(other);
+    const fresh = await index(game('13,NEW\n', '@PROBE\nSIF ABL:NEW > 0\nRETURN 2\n'));
+    expect(bindings(ga)).toEqual(bindings(fresh));
+  }, 120_000);
+
+  it('uses final numeric rows, lowest final named slot and exact raw whitespace while retaining conflict evidence', async () => {
+    const csv = '8,SAME\n3,SAME\n3,OLD\n3,SAME\n4, PAD \n5,OLD\n5,\n';
+    const extracted = extractEraCsv('CSV/Abl.csv', csv);
+    expect(extracted.errors.filter(e => e.code === 'era_duplicate_slot').map(e => e.line)).toEqual([3, 4, 7]);
+    expect(extracted.nodes.filter(n => n.qualifiedName === 'ERA::SLOT::ABL:3').map(n => [n.name, n.startLine])).toEqual([['SAME', 2], ['OLD', 3], ['SAME', 4]]);
+    const root = game(csv, '@PROBE\nSIF ABL:SAME > 0\nRETURN 1\nSIF ABL:3 > 0\nRETURN 2\nSIF ABL:OLD > 0\nRETURN 3\nSIF ABL:PAD > 0\nRETURN 4\n');
+    fs.writeFileSync(path.join(root, 'CSV/Chara001.csv'), '番号,1\n能力, PAD ,1\n');
+    const graph = await index(root);
+    const targets = bindings(graph);
+    expect(targets.filter(r => r[0]?.endsWith(':3') || r[0]?.endsWith(':SAME')).map(r => r.slice(1))).toEqual([['ERA::SLOT::ABL:3', 4], ['ERA::SLOT::ABL:3', 4]]);
+    expect(targets.filter(r => r[0]?.endsWith(':OLD') || r[0]?.endsWith(':PAD')).map(r => r[1])).toEqual(['ERA::VAR::ABL', 'ERA::VAR::ABL']);
+    const chara = graph.getNodesByQualifiedName('ERA::CHARA::1')[0]!;
+    expect(graph.getOutgoingEdges(chara.id).filter(e => e.kind === 'writes').map(e => graph.getNode(e.target)?.name)).toEqual([' PAD ']);
+    expect(graph.getNodesByQualifiedName('ERA::SLOT::ABL:5').find(n => n.startLine === 7)?.decorators).toContain('era:empty-slot-name');
+  }, 120_000);
+
+  it('indexes and displays equivalent UTF-8 and CP932 input with identical freshness hashes', async () => {
+    const csv = '10,能力\n';
+    const erb = '@試験\nSIF ABL:能力 > 0\nRETURN 1\n';
+    const sjisCsv = Buffer.concat([Buffer.from('10,'), Buffer.from('945c97cd', 'hex'), Buffer.from('\n')]);
+    const sjisErb = Buffer.concat([Buffer.from('@'), Buffer.from('8e8e8cb1', 'hex'), Buffer.from('\nSIF ABL:'), Buffer.from('945c97cd', 'hex'), Buffer.from(' > 0\nRETURN 1\n')]);
+    const utf = await index(game(csv, erb));
+    const sjisRoot = game(sjisCsv, sjisErb);
+    const sjis = await index(sjisRoot);
+    for (const graph of [utf, sjis]) {
+      const fn = graph.getNodesByName('試験')[0]!;
+      expect(graph.getOutgoingEdges(fn.id).filter(e => e.kind === 'reads').map(e => graph.getNode(e.target)?.name)).toEqual(['能力']);
+      expect(await graph.getCode(fn.id)).toContain('ABL:能力');
+      const handler = new ToolHandler(graph);
+      const result = await handler.execute('codegraph_node', { file: 'ERB/main.erb' });
+      expect(JSON.stringify(result)).toContain('ABL:能力');
+    }
+    expect(sjis.getFile('ERB/main.erb')?.contentHash).toBe(utf.getFile('ERB/main.erb')?.contentHash);
+    expect(readSourceText(path.join(sjisRoot, 'ERB/main.erb'), 'ERB/main.erb')).toBe(erb);
+    expect(await validateAnswerFiles(sjisRoot, [{ path: 'ERB/main.erb', contentHash: sjis.getFile('ERB/main.erb')!.contentHash }])).toEqual({ stale: [], unchecked: [] });
+    expect(() => decodeSourceBytes(Buffer.from([0xef, 0xbb, 0xbf, 0xff]), 'ERB/main.erb')).toThrow();
+    fs.writeFileSync(path.join(sjisRoot, 'ERB/main.erb'), Buffer.concat([sjisErb, Buffer.from(';changed\n')]));
+    expect((await validateAnswerFiles(sjisRoot, [{ path: 'ERB/main.erb', contentHash: sjis.getFile('ERB/main.erb')!.contentHash }])).stale).toEqual(['ERB/main.erb']);
+  }, 120_000);
+
+  it('reloads an edited profile and reparses unchanged source in the same instance', async () => {
+    const root = game('10,KNOWN\n', '@PROBE\nSIF ABL:KNOWN > 0\nRETURN 1\n');
+    const profilePath = path.join(root, 'engine.json');
+    const profile = structuredClone(getEraProfile().profile);
+    fs.writeFileSync(profilePath, JSON.stringify(profile));
+    const prior = process.env.CODEGRAPH_ERA_PROFILE;
+    process.env.CODEGRAPH_ERA_PROFILE = profilePath;
+    try {
+      const graph = await index(root);
+      profile.variables = profile.variables.filter(v => v.name !== 'ABL');
+      fs.writeFileSync(profilePath, JSON.stringify(profile));
+      await graph.sync();
+      expect(graph.getNodesByQualifiedName('ERA::VAR::ABL')).toEqual([]);
+      expect(bindings(graph)).toEqual([]);
+      const fresh = await index(game('10,KNOWN\n', '@PROBE\nSIF ABL:KNOWN > 0\nRETURN 1\n'));
+      expect(bindings(graph)).toEqual(bindings(fresh));
+    } finally {
+      if (prior === undefined) delete process.env.CODEGRAPH_ERA_PROFILE;
+      else process.env.CODEGRAPH_ERA_PROFILE = prior;
+    }
+  }, 120_000);
+
+  it('keeps a 17 MB ERB outside decoding, indexing and source display', async () => {
+    const root = game('10,KNOWN\n', '@PROBE\nRETURN 1\n');
+    const file = path.join(root, 'ERB/oversize.erb');
+    const fd = fs.openSync(file, 'w');
+    try { fs.ftruncateSync(fd, 17 * 1024 * 1024); } finally { fs.closeSync(fd); }
+    expect(readSourceText(file, 'ERB/oversize.erb')).toBeNull();
+    const graph = await index(root);
+    expect(graph.getFile('ERB/oversize.erb')?.nodeCount).toBe(0);
+    expect(graph.getFile('ERB/oversize.erb')?.errors?.some(e => e.code === 'size_exceeded')).toBe(true);
+    const result = await new ToolHandler(graph).execute('codegraph_node', { file: 'ERB/oversize.erb' });
+    expect(JSON.stringify(result)).toMatch(/could not read|too large|limit/i);
+  }, 120_000);
 });

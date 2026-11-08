@@ -47,7 +47,6 @@ import {
 } from '../search/query-paths';
 import {
   existsSync,
-  readFileSync,
   realpathSync,
   statSync,
 } from 'fs';
@@ -150,7 +149,7 @@ function wslSharedIndexGuidance(err: WslSharedIndexError): string {
  */
 export { PathRefusalError } from '../errors';
 import { PathRefusalError } from '../errors';
-import { indexedHashInput } from '../file-limits';
+import { indexedHashInput, readSourceText } from '../file-limits';
 import { resolve as resolvePath, relative as relativePath, dirname } from 'path';
 
 /** Maximum output length to prevent context bloat (characters) */
@@ -2890,7 +2889,7 @@ export class ToolHandler {
         if (st.size !== rec.size || Math.floor(st.mtimeMs) !== Math.floor(rec.modifiedAt)) {
           // A file over the index's size limit is stored as its size stamp
           // (#1910), so it is compared as one, without reading it.
-          const data = indexedHashInput(st.size, () => content ?? readFileSync(absPath, 'utf-8'), relPath);
+          const data = indexedHashInput(st.size, () => content ?? readSourceText(absPath, relPath) ?? '', relPath);
           // Must stay byte-identical to extraction's `hashContent` (sha256 over
           // the utf-8 string) — the identical-rewrite test in
           // mcp-stale-slice.test.ts pins the parity. Inlined (not imported)
@@ -5998,9 +5997,10 @@ export class ToolHandler {
         continue;
       }
 
-      let fileContent: string;
+      let fileContent: string | null;
       try {
-        fileContent = readFileSync(absPath, 'utf-8');
+        fileContent = readSourceText(absPath, filePath);
+        if (fileContent === null) continue;
       } catch {
         diag?.recordSkip(filePath, 'unreadable');
         continue;
@@ -8371,7 +8371,7 @@ export class ToolHandler {
     const abs = validatePathWithinRoot(cg.getProjectRoot(), filePath);
     let content: string | null = null;
     if (abs) {
-      try { content = readFileSync(abs, 'utf-8'); } catch { content = null; }
+      try { content = readSourceText(abs, filePath); } catch { content = null; }
     }
     if (content === null) {
       const out = [`**${filePath}**${testLabel} — could not read from disk (it may have moved since indexing). ${depSummary}`, ''];
@@ -8483,9 +8483,10 @@ export class ToolHandler {
       try {
         const absPath = validatePathWithinRoot(cg.getProjectRoot(), node.filePath);
         if (absPath && existsSync(absPath) && !isConfigLeafNode(node)) {
-          const content = readFileSync(absPath, 'utf-8');
-          const body = content.replace(/\n+$/, '');
+          const content = readSourceText(absPath, node.filePath);
+          const body = content?.replace(/\n+$/, '');
           if (
+            body !== undefined &&
             body.length <= ToolHandler.STALE_WHOLE_FILE_MAX_CHARS &&
             body.split('\n').length <= ToolHandler.STALE_WHOLE_FILE_MAX_LINES
           ) {

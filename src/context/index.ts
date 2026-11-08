@@ -7,6 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { readSourceText } from '../file-limits';
 import {
   Node,
   Edge,
@@ -1435,7 +1436,8 @@ export class ContextBuilder {
     }
 
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = readSourceText(filePath, node.filePath);
+      if (content === null) return null;
       const lines = content.split('\n');
 
       // Extract lines (1-indexed to 0-indexed)

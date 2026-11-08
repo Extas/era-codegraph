@@ -51,6 +51,7 @@ import '../compile-cache';
 import { Command } from 'commander';
 import * as path from 'path';
 import * as fs from 'fs';
+import { readSourceText } from '../file-limits';
 import { getCodeGraphDir, makeGitignoreLocalOnly, isInitialized, hasSchemalessDb, hasForeignDbFile, unsafeIndexRootReason, findNearestCodeGraphRoot, planFrontload, isTaskNotification, isAgentMessage, isCrossSessionMessage, stripSystemReminders, hasStructuralKeyword, extractCodeTokens, capPromptHookInjection, codeGraphDirName, DEFAULT_CODEGRAPH_DIR } from '../directory';
 import { extractProseCandidates } from '../search/identifier-segments';
 import { detectWorktreeIndexMismatch, worktreeMismatchWarning } from '../sync/worktree';
@@ -58,7 +59,7 @@ import { createShimmerProgress } from '../ui/shimmer-progress';
 import { getGlyphs } from '../ui/glyphs';
 import { ansiColorsEnabled } from '../ui/color';
 
-import { buildNode25BlockBanner, buildNodeTooOldBanner, MIN_NODE_MAJOR } from './node-version-check';
+import { buildNode25BlockBanner, buildNodeTooOldBanner, MIN_NODE_MAJOR, MIN_NODE_MINOR } from './node-version-check';
 import { installFatalHandlers } from './fatal-handler';
 import { relaunchWithWasmRuntimeFlagsIfNeeded } from '../extraction/wasm-runtime-flags';
 import { installCommandSupervision, watchParent } from './command-supervision';
@@ -122,7 +123,7 @@ if (nodeMajor >= 25) {
 // Enforce the supported Node floor. `engines` in package.json only *warns* on
 // install (unless engine-strict), so hard-block here to actually keep users off
 // unsupported versions. Mirrors the 25+ block above. See package.json `engines`.
-if (nodeMajor < MIN_NODE_MAJOR) {
+if (nodeMajor < MIN_NODE_MAJOR || (nodeMajor === MIN_NODE_MAJOR && Number(nodeVersion.split('.')[1]) < MIN_NODE_MINOR)) {
   process.stderr.write(buildNodeTooOldBanner(nodeVersion) + '\n');
   if (!process.env.CODEGRAPH_ALLOW_UNSAFE_NODE) {
     process.exit(1);
@@ -2833,7 +2834,7 @@ program
         const sources = new Map<string, string | undefined>();
         const sourceOf = (filePath: string): string | undefined => {
           if (!sources.has(filePath)) {
-            try { sources.set(filePath, fs.readFileSync(path.join(projectPath, filePath), 'utf-8')); } catch { sources.set(filePath, undefined); }
+            try { sources.set(filePath, readSourceText(path.join(projectPath, filePath), filePath) ?? undefined); } catch { sources.set(filePath, undefined); }
           }
           return sources.get(filePath);
         };

@@ -4,15 +4,23 @@ Run: pwsh scripts/era/deploy.ps1 [-InstallRoot C:\path\to\codegraph]
 Writes directly to current/lib-era and replaces existing files.
 CARGO_TARGET_DIR can place/cache Rust build output outside the repository.
 #>
-param([string]$InstallRoot = "$env:LOCALAPPDATA\codegraph")
+param(
+    [string]$InstallRoot = "$env:LOCALAPPDATA\codegraph",
+    [string]$NodePath = (Get-Command node.exe -CommandType Application).Source
+)
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 Set-StrictMode -Version Latest
 $repo = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$previousPath = $env:PATH
 Push-Location $repo
 try {
-    $node = (Get-Command node.exe -CommandType Application).Source
+    $node = (Get-Item $NodePath).FullName
+    & $node -e "const [major,minor]=process.versions.node.split('.').map(Number); if(major<22 || (major===22 && minor<13) || major>=25) { console.error('ERA deployment needs Node >=22.13 and <25; select it with -NodePath.'); process.exit(1); } require('node:sqlite');"
+    # npm/npx and their child workers must use the same runtime we bundle.
+    # This is process-local and is restored on every exit, not a system PATH edit.
+    $env:PATH = "$(Split-Path $node -Parent);$previousPath"
     $package = Get-Content package.json -Raw | ConvertFrom-Json
     $version = "$($package.version)-era"
     $current = Join-Path ([IO.Path]::GetFullPath($InstallRoot)) 'current'
@@ -55,5 +63,6 @@ exec "$DIR/node.exe" --liftoff-only --disable-warning=ExperimentalWarning "$DIR/
 
     Write-Host "Installed: $current ($version)"
 } finally {
+    $env:PATH = $previousPath
     Pop-Location
 }

@@ -74,8 +74,8 @@ export interface EraEngineProfile {
     productVersion: string | null;
   };
   /**
-   * Emuera reads UTF-8 first and falls back to the ANSI code page. Games ship
-   * either, so decoding tries `primary` then `fallback`.
+   * Emuera validates UTF-8, then falls back to CP932 on invalid bytes.
+   * A UTF-8 BOM selects UTF-8 without fallback; invalid fallback bytes fail.
    */
   encoding: { primary: string; fallback: string };
   /** Ontology CSV file names the engine loads, in load order. */
@@ -137,17 +137,19 @@ export interface EraProfileIndex {
 
 /** Wildcard CSVs describe instance data, not ontology. */
 const NON_ONTOLOGY_CSV = /\*/;
-let cached: EraProfileIndex | null = null;
+let cached: { signature: string; index: EraProfileIndex } | null = null;
 
-/** Load and index the active engine profile. Cached for the process. */
+/** Reload an external profile when its file changes; extraction shares its indexed view. */
 export function getEraProfile(): EraProfileIndex {
-  if (cached) return cached;
   const requested = process.env.CODEGRAPH_ERA_PROFILE?.trim();
+  if (requested && !path.isAbsolute(requested)) {
+    throw new Error('CODEGRAPH_ERA_PROFILE must be an absolute path to a JSON profile');
+  }
+  const stat = requested ? fs.statSync(requested) : null;
+  const signature = requested ? `${requested}\0${stat!.mtimeMs}\0${stat!.ctimeMs}\0${stat!.size}` : 'bundled';
+  if (cached?.signature === signature) return cached.index;
   let profile = defaultProfile as EraEngineProfile;
   if (requested) {
-    if (!path.isAbsolute(requested)) {
-      throw new Error('CODEGRAPH_ERA_PROFILE must be an absolute path to a JSON profile');
-    }
     try {
       profile = JSON.parse(fs.readFileSync(requested, 'utf8')) as EraEngineProfile;
     } catch (error) {
@@ -160,13 +162,9 @@ export function getEraProfile(): EraProfileIndex {
   if (profile.schemaVersion !== 1) {
     throw new Error('Era engine profile has unsupported schemaVersion ' + profile.schemaVersion);
   }
-  cached = indexProfile(profile);
-  return cached;
-}
-
-/** Reset the cache. Tests use this to swap profiles; production never calls it. */
-export function resetEraProfileCache(): void {
-  cached = null;
+  const index = indexProfile(profile);
+  cached = { signature, index };
+  return index;
 }
 
 /** Build the lookup maps every extractor and the resolver share. */
@@ -231,13 +229,7 @@ export function isEraOntologyCsv(filePath: string, index?: EraProfileIndex): boo
   // GameBase.csv is not an ontology table, but it is where the engine
   // vocabulary is anchored, so it has to be indexed too.
   if (lower === 'gamebase.csv') return true;
-  let profileIndex: EraProfileIndex;
-  try {
-    profileIndex = index ?? getEraProfile();
-  } catch {
-    return false;
-  }
-  return profileIndex.ontologyCsvNames.has(lower);
+  return (index ?? getEraProfile()).ontologyCsvNames.has(lower);
 }
 
 /**

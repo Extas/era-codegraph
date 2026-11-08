@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
-import { eraSourceSizeLimit } from './era';
+import { eraSourceSizeLimit, isEraSourceFile, getEraProfile } from './era';
 
 /**
  * Default source size limit. Generated bundles and dependency archives above
@@ -11,6 +11,23 @@ export const MAX_SOURCE_FILE_SIZE_BYTES = 1024 * 1024;
 
 export function sourceSizeLimit(filePath: string): number {
   return eraSourceSizeLimit(filePath) ?? MAX_SOURCE_FILE_SIZE_BYTES;
+}
+
+/** Emuera EncodingHandler: strict UTF-8, then strict CP932; a UTF-8 BOM commits to UTF-8. */
+export function decodeSourceBytes(bytes: Buffer, filePath: string): string {
+  if (!isEraSourceFile(filePath)) return bytes.toString('utf8');
+  const { primary, fallback } = getEraProfile().profile.encoding;
+  const decoder = new TextDecoder(primary, { fatal: true });
+  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) return decoder.decode(bytes);
+  // StreamReader also recognizes UTF-16 BOMs before validating UTF-8.
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) return new TextDecoder('utf-16le', { fatal: true }).decode(bytes);
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) return new TextDecoder('utf-16be', { fatal: true }).decode(bytes);
+  try {
+    return decoder.decode(bytes);
+  } catch (error) {
+    if (!(error instanceof TypeError)) throw error;
+    return new TextDecoder(fallback, { fatal: true }).decode(bytes);
+  }
 }
 
 /**
@@ -45,14 +62,9 @@ export function indexedHashInput(size: number, content: () => string, filePath =
  * A project-relative filePath retains the same Era limit used during extraction.
  */
 export function readSourceText(file: string, filePath = ''): string | null {
-  const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NONBLOCK ?? 0));
-  try {
-    const stats = fs.fstatSync(fd);
-    if (!stats.isFile() || stats.size > sourceSizeLimit(filePath)) return null;
-    return fs.readFileSync(fd, 'utf-8');
-  } finally {
-    fs.closeSync(fd);
-  }
+  if (!fs.statSync(file).isFile()) return null;
+  const { bytes } = readBoundedSourceSync(file, filePath);
+  return bytes === null ? null : decodeSourceBytes(bytes, filePath);
 }
 
 /** A source file's stats, and its bytes when they are within the limit (null = oversize). */
@@ -79,7 +91,7 @@ export async function readBoundedSource(file: string, filePath = file): Promise<
   const initial = await fsp.stat(file);
   assertRegularFile(initial);
   if (initial.size > limit) return { stats: initial, bytes: null };
-  const handle = await fsp.open(file, 'r');
+  const handle = await fsp.open(file, fs.constants.O_RDONLY | (fs.constants.O_NONBLOCK ?? 0));
   try {
     let stats = await handle.stat();
     assertRegularFile(stats);
@@ -110,7 +122,7 @@ export function readBoundedSourceSync(file: string, filePath = file): BoundedSou
   const initial = fs.statSync(file);
   assertRegularFile(initial);
   if (initial.size > limit) return { stats: initial, bytes: null };
-  const fd = fs.openSync(file, 'r');
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NONBLOCK ?? 0));
   try {
     let stats = fs.fstatSync(fd);
     assertRegularFile(stats);

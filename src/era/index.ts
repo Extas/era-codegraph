@@ -28,7 +28,7 @@ import { isEraCharaCsv, isEraOntologyCsv } from './profile';
 
 export { extractEraBasic } from './erb';
 export { extractEraCsv } from './csv';
-export { eraResolver, resetEraResolverCaches } from './resolver';
+export { eraResolver } from './resolver';
 export { eraDispatchPass } from './dispatch';
 export * from './profile';
 export * from './names';

@@ -35,6 +35,7 @@
 
 import type CodeGraph from '../../index';
 import type { Edge, Language, Node } from '../../types';
+import { readSourceText } from '../../file-limits';
 import { guardLabel, guardsForFile, siteKey, supportsBranchGuards } from '../../graph/branch-guards';
 import {
   resolveNamedSymbolFlow,
@@ -63,7 +64,6 @@ import {
   type WireList,
   type WireNodeRef,
 } from './wire';
-import * as fs from 'fs';
 
 /** Lines shown either side of the call site on a card (design spec §3.5). */
 export const SOURCE_WINDOW = 3;
@@ -379,8 +379,9 @@ function loadFile(
     try {
       // The chokepoint, before anything is opened — see `source.ts`.
       const absolute = resolveProjectFile(projectRoot, found.storedPath);
+      const content = readSourceText(absolute, found.storedPath);
       entry = {
-        lines: splitLines(fs.readFileSync(absolute, 'utf-8')),
+        lines: content === null ? null : splitLines(content),
         language: found.record.language,
         abs: absolute,
         drift: false,
