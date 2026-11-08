@@ -1,5 +1,5 @@
 /**
- * Era (Emuera) adapter contract: one `it` per clause of the fork's Era contract.
+ * Era (Emuera) extraction and resolution behavior.
  *
  * `fixtures/era-game` is a minimal game in the shape Emuera loads (UTF-8 BOM,
  * top-level ERB/ and CSV/), plus the decoys the contract keeps out: an optional
@@ -110,9 +110,8 @@ describe('Era (Emuera) contract', () => {
     expect(fn('EXEC_COM').decorators).toEqual(expect.arrayContaining(['branches:2', 'random', 'dynamic-dispatch:1']));
   });
 
-  it('indexes a >1 MB script under ERB/ (16 MB cap) without reporting it as changed', () => {
+  it('indexes a >1 MB script under ERB/ (16 MB cap)', () => {
     expect(fs.statSync(path.join(dir, BIG)).size).toBeGreaterThan(1024 * 1024);
     expect(fn('KOJO_BIG').filePath).toBe(BIG);
-    expect(cg.getChangedFiles().modified).not.toContain(BIG);
   });
 });

@@ -1,8 +1,8 @@
-> **Era fork.** Upstream `colbymchenry/codegraph` is the authority for everything
-> outside `src/era/`, which joins it through the seams listed in `src/era/index.ts`.
-> Sync: `git merge upstream/main`, resolve only seam lines, run
-> `npx vitest run __tests__/era.test.ts`, deploy with `pwsh scripts/era/deploy.ps1`.
-> Upstream's release, changelog, telemetry and full-suite rules below do not apply here.
+> **Era fork.** Maintain `src/era/`, `scripts/era/` and the adapter seams listed in
+> `src/era/index.ts`. Keep upstream parsing and resolution outside those seams.
+> `scripts/era/deploy.ps1` builds and writes directly to `current/lib-era`;
+> existing files are replaced and filesystem errors remain visible.
+> Upstream release, changelog, telemetry and full-suite rules below do not apply here.
 
 # AGENTS.md
 

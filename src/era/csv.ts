@@ -286,9 +286,7 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
         startColumn: 0,
         endColumn: 0,
         signature: `${variable.name} [${traits.join(', ')}]`,
-        // Which engine build defines this variable is the whole provenance
-        // claim; without it the node is an assertion about "Era" in general.
-        docstring: `Emuera built-in. Engine ${profile.id} (${profile.engine.sha256.slice(0, 12)}).`,
+        docstring: `Emuera built-in. Engine ${profile.id}.`,
         decorators: traits,
         isExported: true,
         // `save` variables persist across sessions; the rest are interpreter

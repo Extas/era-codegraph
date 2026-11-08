@@ -24,16 +24,15 @@
  *
  * Usage:
  *   node scripts/era/build-engine-profile.mjs \
- *     --src <decompiled-dir> --engine <Emuera.exe> [--id <profile-id>] [--out <profile.json>]
+ *     --src <decompiled-dir> --engine <engine-name> [--id <profile-id>] [--out <profile.json>]
  * Defaults to src/era/profiles/<profile-id>.json relative to this script.
+ * --engine records a name only; the binary itself is not read.
  *
- * The decompile itself is copyrighted engine code and is NOT checked in.
  * The generated profile is the factual engine vocabulary used by src/era.
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
 const args = parseArgs(process.argv.slice(2));
@@ -87,14 +86,12 @@ for (const [name, csv] of Object.entries(bindings.varToCsv)) {
   }
 }
 
-const engineBytes = fs.readFileSync(args.engine);
 const profile = {
   schemaVersion: 1,
   id: args.id || inferEngineId(args.engine),
   derived: 'source',
   engine: {
     path: path.basename(args.engine),
-    sha256: crypto.createHash('sha256').update(engineBytes).digest('hex'),
     fileVersion: args.fileVersion || null,
     productVersion: args.productVersion || null,
   },

@@ -4,7 +4,6 @@
   "derived": "source",
   "engine": {
     "path": "Emuera.exe",
-    "sha256": "b88278c40bc5f7f7e30e654cce79b3a42f8ecaa20c29b2909a9a782aec1b389f",
     "fileVersion": "1.824.0.0",
     "productVersion": "EEv55+MRv2"
   },

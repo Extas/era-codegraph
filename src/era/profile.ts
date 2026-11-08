@@ -70,7 +70,6 @@ export interface EraEngineProfile {
   derived: 'source' | 'declared';
   engine: {
     path: string;
-    sha256: string;
     fileVersion: string | null;
     productVersion: string | null;
   };

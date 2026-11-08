@@ -31,7 +31,6 @@ import * as path from 'path';
 import * as https from 'https';
 import { spawnSync } from 'child_process';
 import { ansiColorsEnabled } from '../ui/color';
-import { isEraBuild } from '../era';
 
 export const REPO = 'colbymchenry/codegraph';
 export const NPM_PACKAGE = '@colbymchenry/codegraph';
@@ -419,10 +418,6 @@ export function reindexAdvisory(): string {
  * Returns the process exit code (0 = success / nothing to do, 1 = failure).
  */
 export async function runUpgrade(opts: UpgradeOptions, deps: UpgradeDeps): Promise<number> {
-  if (isEraBuild()) {
-    deps.error('Era fork build: update it with scripts/era/deploy.ps1 from the fork checkout.');
-    return 1;
-  }
   const { currentVersion, method } = deps;
 
   // Resolve the target version (pinned or latest).
