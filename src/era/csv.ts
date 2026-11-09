@@ -1,10 +1,10 @@
 import { Node, Edge, ExtractionResult, ExtractionError, UnresolvedReference } from '../types';
 import { generateNodeId } from '../extraction/tree-sitter-helpers';
 import { getEraProfile, isEraCharaCsv, EraVariable } from './profile';
-import { PreparedLine, prepareLines } from './lines';
+import type { PreparedLine } from './lines';
 import { qualifySlot, qualifyVariable, refVariable } from './names';
 
-/** All engine CSV formats share comment handling, line numbers and comma fields. */
+/** CSV rows retain the engine's raw fields and original line numbers. */
 interface CsvRow {
   line: PreparedLine;
   fields: string[];
@@ -32,11 +32,11 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
   const edges: Edge[] = [];
   const unresolvedReferences: UnresolvedReference[] = [];
   const errors: ExtractionError[] = [];
-  const lines = prepareLines(source);
+  const rawLines = source.replace(/^\uFEFF/, '').split(/\r?\n/);
   const rows: CsvRow[] = [];
   // EraStreamReader skips leading whitespace/comment-only lines. loadDataTo
   // splits the remaining raw line, without trimming fields or inline comments.
-  for (const [offset, raw] of source.replace(/^\uFEFF/, '').split(/\r?\n/).entries()) {
+  for (const [offset, raw] of rawLines.entries()) {
     const code = raw.trimStart();
     if (!code || code.startsWith(';')) continue;
     const fields = code.split(',');
@@ -47,7 +47,7 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
   const fileNode: Node = {
     id: generateNodeId(filePath, 'file', filePath, 1),
     kind: 'file', name: baseName(), qualifiedName: filePath, filePath,
-    language: 'eracsv', startLine: 1, endLine: lines.length,
+    language: 'eracsv', startLine: 1, endLine: rawLines.length,
     startColumn: 0,
     endColumn: charaSheet || engineAnchor ? 0 : (source.slice(source.lastIndexOf('\n') + 1).length),
     updatedAt: Date.now(),
@@ -178,7 +178,7 @@ export function extractEraCsv(filePath: string, source: string): ExtractionResul
       filePath: filePath,
       language: 'eracsv',
       startLine: 1,
-      endLine: lines.length,
+      endLine: rawLines.length,
       startColumn: 0,
       endColumn: 0,
       signature: `chara ${number || '?'}${name ? ` ${name}` : ''}`,
