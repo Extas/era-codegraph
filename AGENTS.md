@@ -6,6 +6,8 @@
 
 # AGENTS.md
 
+遵守 [工作区准则](D:/projects/AGENTS.md)；本文只记本仓本地差异，通用工程底线与跨仓技能见全局 `AGENTS.md` 与对应 Skill。
+
 Canonical project guidance for coding agents working in this repository (Codex/Astra, Claude Code via `@AGENTS.md`, Cursor, etc.).
 
 **Codex size note:** root `AGENTS.md` is intentionally kept near ~35 KiB (critical build/test/arch/retrieval rules retained). Longer validation methodology + the Excalidraw worked example live in `docs/AGENTS.md`. This environment sets `project_doc_max_bytes = 49152` so root (and root+`docs/` when cwd is under `docs/`) are not silently truncated at the 32 KiB default.
