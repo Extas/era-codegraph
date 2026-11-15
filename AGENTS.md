@@ -3,6 +3,16 @@
 > `scripts/era/deploy.ps1` builds and writes directly to `current/lib-era`;
 > existing files are replaced and filesystem errors remain visible.
 > Upstream release, changelog, telemetry and full-suite rules below do not apply here.
+>
+> Maintenance upstream: `upstream/main` (`colbymchenry/codegraph`); publish only to
+> `origin/main` (`Extas/era-codegraph`). Adopted baseline:
+> [`f72c9d2efb14454ff4f9fd7b8460abd82f19a287`](https://github.com/colbymchenry/codegraph/commit/f72c9d2efb14454ff4f9fd7b8460abd82f19a287),
+> integrated by `bd95432b962fbc63d0eda7a0eacc57a7609e419f`.
+> Preserve committed fork changes, fetch both remotes, fast-forward from origin
+> where possible, then merge the maintenance upstream without rewriting history.
+> Migrate Era seam callers to the upstream interfaces; validate the Era contract
+> with `__tests__/era.test.ts`. Deployment is separate and explicit.
+> Follow the [shared remote-sync policy](https://github.com/Extas/agent-skills/blob/main/skills/agents-engineering/references/version-control.md#远端同步).
 
 # AGENTS.md
 
