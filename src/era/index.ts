@@ -12,14 +12,16 @@
  * 2. extraction/kernel/loader.ts accepts a prefix edge table, exact node table.
  * 3. extraction/grammars.ts delegates Era recognition/support/display names.
  * 4. extraction/tree-sitter.ts dispatches grammarless Era extraction.
- * 5. file-limits.ts applies Era limits by project-relative path; extraction/index,
- *    mcp/tools, mcp/answer-freshness and resolution/index pass that path.
+ * 5. file-limits.ts applies Era decoding and limits by project-relative path;
+ *    extraction/index, mcp/tools, mcp/answer-freshness and resolution/index pass
+ *    that path. extraction/index reparses Era files when CSV/profile facts change.
  * 6. resolution/frameworks/index.ts appends eraResolver.
  * 7. resolution/callback-synthesizer.ts appends eraDispatchPass and its input gate.
  * 8. graph/traversal, context/index, context/formatter and mcp/tools include
  *    reads/writes in usage, recovery and significance sets (not control flow).
  * 9. db/queries.ts appends the unresolved-reference prefix query if needed.
- * 10. extraction/extraction-version.ts is upstream + 1.
+ * 10. extraction/extraction-version.ts stays newer than upstream to invalidate
+ *     indexes when Era extraction or engine slot semantics change.
  * 11. AGENTS.md describes the maintained fork scope and direct deployment.
  */
 import * as path from 'path';
