@@ -828,7 +828,7 @@ export class ReferenceResolver {
       // Import resolvers may follow package metadata to an archive (`file:*.har`,
       // for example). Reject anything extraction would not accept before UTF-8
       // decoding can multiply a large binary blob into gigabytes of V8 heap.
-      const content = readSourceText(fullPath, filePath);
+      const content = readSourceText(fullPath, undefined, filePath);
       this.fileCache.set(filePath, content);
       return content;
     } catch (error) {
@@ -852,6 +852,16 @@ export class ReferenceResolver {
       return fs.readFileSync(fullPath).includes(needle);
     } catch {
       return false;
+    }
+  }
+
+  /** The text a walk over the indexed files reads: see ResolutionContext.scanFile. */
+  private scanFile(filePath: string): string | null {
+    if (this.fileCache.has(filePath)) return this.fileCache.get(filePath) ?? null;
+    try {
+      return readSourceText(path.join(this.projectRoot, filePath), 'latin1', filePath);
+    } catch {
+      return null;
     }
   }
 
@@ -1042,6 +1052,7 @@ export class ReferenceResolver {
       readFile: (filePath: string) => this.readFileCached(filePath),
 
       fileContains: (filePath: string, needle: string) => this.fileContains(filePath, needle),
+      scanFile: (filePath: string) => this.scanFile(filePath),
 
       getFileLines: (filePath: string) => {
         const cached = this.fileLinesCache.get(filePath);

@@ -379,7 +379,7 @@ function loadFile(
     try {
       // The chokepoint, before anything is opened — see `source.ts`.
       const absolute = resolveProjectFile(projectRoot, found.storedPath);
-      const content = readSourceText(absolute, found.storedPath);
+      const content = readSourceText(absolute, undefined, found.storedPath);
       entry = {
         lines: content === null ? null : splitLines(content),
         language: found.record.language,

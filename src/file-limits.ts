@@ -61,10 +61,13 @@ export function indexedHashInput(size: number, content: () => string, filePath =
  * open itself. Throws what a failed open or read throws.
  * A project-relative filePath retains the same Era limit used during extraction.
  */
-export function readSourceText(file: string, filePath = ''): string | null {
+export function readSourceText(file: string, encoding: BufferEncoding = 'utf-8', filePath = ''): string | null {
   if (!fs.statSync(file).isFile()) return null;
   const { bytes } = readBoundedSourceSync(file, filePath);
-  return bytes === null ? null : decodeSourceBytes(bytes, filePath);
+  if (bytes === null) return null;
+  return encoding === 'utf-8' || encoding === 'utf8'
+    ? decodeSourceBytes(bytes, filePath)
+    : bytes.toString(encoding);
 }
 
 /** A source file's stats, and its bytes when they are within the limit (null = oversize). */

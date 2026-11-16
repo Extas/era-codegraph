@@ -2834,7 +2834,7 @@ program
         const sources = new Map<string, string | undefined>();
         const sourceOf = (filePath: string): string | undefined => {
           if (!sources.has(filePath)) {
-            try { sources.set(filePath, readSourceText(path.join(projectPath, filePath), filePath) ?? undefined); } catch { sources.set(filePath, undefined); }
+            try { sources.set(filePath, readSourceText(path.join(projectPath, filePath), undefined, filePath) ?? undefined); } catch { sources.set(filePath, undefined); }
           }
           return sources.get(filePath);
         };

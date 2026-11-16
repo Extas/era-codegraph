@@ -202,7 +202,7 @@ describe('Era source facts across indexing lifetimes', () => {
       expect(JSON.stringify(result)).toContain('ABL:能力');
     }
     expect(sjis.getFile('ERB/main.erb')?.contentHash).toBe(utf.getFile('ERB/main.erb')?.contentHash);
-    expect(readSourceText(path.join(sjisRoot, 'ERB/main.erb'), 'ERB/main.erb')).toBe(erb);
+    expect(readSourceText(path.join(sjisRoot, 'ERB/main.erb'), undefined, 'ERB/main.erb')).toBe(erb);
     expect(await validateAnswerFiles(sjisRoot, [{ path: 'ERB/main.erb', contentHash: sjis.getFile('ERB/main.erb')!.contentHash }])).toEqual({ stale: [], unchecked: [] });
     expect(() => decodeSourceBytes(Buffer.from([0xef, 0xbb, 0xbf, 0xff]), 'ERB/main.erb')).toThrow();
     fs.writeFileSync(path.join(sjisRoot, 'ERB/main.erb'), Buffer.concat([sjisErb, Buffer.from(';changed\n')]));
@@ -236,7 +236,7 @@ describe('Era source facts across indexing lifetimes', () => {
     const file = path.join(root, 'ERB/oversize.erb');
     const fd = fs.openSync(file, 'w');
     try { fs.ftruncateSync(fd, 17 * 1024 * 1024); } finally { fs.closeSync(fd); }
-    expect(readSourceText(file, 'ERB/oversize.erb')).toBeNull();
+    expect(readSourceText(file, undefined, 'ERB/oversize.erb')).toBeNull();
     const graph = await index(root);
     expect(graph.getFile('ERB/oversize.erb')?.nodeCount).toBe(0);
     expect(graph.getFile('ERB/oversize.erb')?.errors?.some(e => e.code === 'size_exceeded')).toBe(true);

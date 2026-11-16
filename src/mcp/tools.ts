@@ -2889,7 +2889,7 @@ export class ToolHandler {
         if (st.size !== rec.size || Math.floor(st.mtimeMs) !== Math.floor(rec.modifiedAt)) {
           // A file over the index's size limit is stored as its size stamp
           // (#1910), so it is compared as one, without reading it.
-          const data = indexedHashInput(st.size, () => content ?? readSourceText(absPath, relPath) ?? '', relPath);
+          const data = indexedHashInput(st.size, () => content ?? readSourceText(absPath, undefined, relPath) ?? '', relPath);
           // Must stay byte-identical to extraction's `hashContent` (sha256 over
           // the utf-8 string) — the identical-rewrite test in
           // mcp-stale-slice.test.ts pins the parity. Inlined (not imported)
@@ -5999,7 +5999,7 @@ export class ToolHandler {
 
       let fileContent: string | null;
       try {
-        fileContent = readSourceText(absPath, filePath);
+        fileContent = readSourceText(absPath, undefined, filePath);
         if (fileContent === null) continue;
       } catch {
         diag?.recordSkip(filePath, 'unreadable');
@@ -8371,7 +8371,7 @@ export class ToolHandler {
     const abs = validatePathWithinRoot(cg.getProjectRoot(), filePath);
     let content: string | null = null;
     if (abs) {
-      try { content = readSourceText(abs, filePath); } catch { content = null; }
+      try { content = readSourceText(abs, undefined, filePath); } catch { content = null; }
     }
     if (content === null) {
       const out = [`**${filePath}**${testLabel} — could not read from disk (it may have moved since indexing). ${depSummary}`, ''];
@@ -8483,7 +8483,7 @@ export class ToolHandler {
       try {
         const absPath = validatePathWithinRoot(cg.getProjectRoot(), node.filePath);
         if (absPath && existsSync(absPath) && !isConfigLeafNode(node)) {
-          const content = readSourceText(absPath, node.filePath);
+          const content = readSourceText(absPath, undefined, node.filePath);
           const body = content?.replace(/\n+$/, '');
           if (
             body !== undefined &&

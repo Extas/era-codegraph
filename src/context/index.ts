@@ -1436,7 +1436,7 @@ export class ContextBuilder {
     }
 
     try {
-      const content = readSourceText(filePath, node.filePath);
+      const content = readSourceText(filePath, undefined, node.filePath);
       if (content === null) return null;
       const lines = content.split('\n');
 
