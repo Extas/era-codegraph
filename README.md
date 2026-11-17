@@ -17,17 +17,17 @@
 
 `node scripts/era/build-engine-profile.mjs --src <反编译源码目录> --engine <Emuera.exe> --id <profile-id> --out <profile.json>` 从引擎源码提取变量、CSV 绑定、指令、内置方法和角色表键。`--engine` 仅提供引擎名称；可用 `--fileVersion`、`--productVersion` 记录版本。输出直接覆盖目标，不读取或计算引擎二进制摘要。
 
-`pwsh scripts/era/deploy.ps1 -InstallRoot <目标目录>` 使用已有 Node、npm、Cargo/MSVC 构建 Windows x64 版本并写入 `current/lib-era`。无需提交工作树，也不创建提交编号目录或暂存交付链。重复运行直接替换文件及启动器；占用、权限等操作系统错误原样失败。脚本不构建 viewer、不终止进程、不删除旧版本目录；`CARGO_TARGET_DIR` 可指定 Rust 构建目录。部署是显式操作，不是研究或编辑的前置步骤。
+`pwsh scripts/era/deploy.ps1 -InstallRoot <目标目录>` 使用已有 Node、npm、Cargo/MSVC 构建 Windows x64 版本并写入 `current/lib-era`。重复运行会覆盖此目录中的对应文件和启动器，占用与权限错误直接返回。`CARGO_TARGET_DIR` 可指定 Rust 构建目录。
 
 运行要求为 Node `>=22.13.0 <25.0.0`，最低版本依据 [Node SQLite 文档](https://nodejs.org/docs/latest-v22.x/api/sqlite.html) 的免实验开关接口。源码入口是本仓库 `src/`；编译 CLI 入口为 `dist/bin/codegraph.js`，源码改动不会自动更新它；部署入口是目标目录 `current/bin/codegraph.cmd`（或同名 shell launcher），调用 `current/node.exe` 和 `current/lib-era/dist/bin/codegraph.js`，不使用系统 Node。
 
-本机命令解析未找到 PATH 上的 `codegraph`；当前系统 `node` 是 `D:/ProgramData/scoop/apps/nodejs-lts/current/node.exe`（26.13.0），不在本 fork 目前声明的系列内。已有独立运行时 `D:/ProgramData/scoop/apps/nodejs-lts/24.22.1/node.exe` 可显式选择；无需安装第三份 Node 或修改全局 PATH。部署脚本的 `-NodePath` 同时决定构建子进程和 bundled runtime，并在退出时还原进程 PATH。例如需部署时使用 `pwsh scripts/era/deploy.ps1 -NodePath D:/ProgramData/scoop/apps/nodejs-lts/24.22.1/node.exe`；这不是本次编辑已执行的操作。
+本机可用 Node 24.22.1 部署：`pwsh scripts/era/deploy.ps1 -NodePath D:/ProgramData/scoop/apps/nodejs-lts/24.22.1/node.exe`。`-NodePath` 同时选择构建子进程和随包分发的运行时，脚本退出时还原进程 PATH。
 
 `install.ps1`、`install.sh` 及上游自动升级面向上游发行版，不是此 Era fork 的更新入口，不应用其覆盖 `lib-era`。
 
 CSV/解码语义依据为引擎 `ConstantData.loadDataTo`（数字行覆盖，再按数字升序构建 `nameToIntDics`）和 `EncodingHandler.DetectEncoding`（验证 UTF-8 后选择 CP932，使用异常回退）。原游戏源码与二进制仅作为只读研究输入。
 
-Era 语义测试位于 `__tests__/era.test.ts`，输入在 `__tests__/fixtures/era-game/`。按所改语义使用，不作为普通研究、保存或安装的前置。
+Era 语义测试位于 `__tests__/era.test.ts`，输入在 `__tests__/fixtures/era-game/`。
 
 
 ## 上游研究资料
