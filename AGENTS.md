@@ -16,7 +16,7 @@
 
 # AGENTS.md
 
-遵守 [工作区准则](D:/projects/AGENTS.md)；本文只记本仓本地差异，通用工程底线与跨仓技能见全局 `AGENTS.md` 与对应 Skill。
+遵守 [工作区约定](D:/projects/AGENTS.md)；本文只记本仓本地差异，通用工程底线与跨仓技能见全局 `AGENTS.md` 与对应 Skill。
 
 Canonical project guidance for coding agents working in this repository (Codex/Astra, Claude Code via `@AGENTS.md`, Cursor, etc.).
 
